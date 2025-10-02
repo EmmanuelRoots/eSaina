@@ -1,6 +1,5 @@
 import { Route, Routes } from "react-router-dom"
 import HomeLayout from "../pages/layout/home.layout"
-import HomePage from "../pages/home"
 import NewsPage from "../pages/news"
 import MessagePage from "../pages/message"
 
@@ -14,10 +13,6 @@ const PrivateRoute = () => {
             >
                 <Route
                     path=""
-                    element={<HomePage/>}
-                />
-                <Route
-                    path="news"
                     element={<NewsPage/>}
                 />
                 <Route
