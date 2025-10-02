@@ -12,8 +12,6 @@ export const useThemeColors = ()=>{
   };
 
   const [theme, setTheme] = useState<ThemeMode>(getPreferredTheme)
-  console.log(theme);
-  
 
   useEffect(() => {
     if (!window.matchMedia) return;
