@@ -1,62 +1,64 @@
-import axios, { type AxiosInstance, type CancelTokenSource } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { LocalStorageKeys } from '../../constants/storage.constant';
 
-
 export const axiosInstance: AxiosInstance = axios.create({
-  timeout: 30000, // le temps maximal d'execution d'une requete est de 30s
-  baseURL: import.meta.env.VITE_BASE_URL
-})
+  timeout: 30000,
+  baseURL: import.meta.env.VITE_BASE_URL,
+});
 
-let cancelTokenSource: CancelTokenSource
-
-export const cancelRequest = () => {
-  if (cancelTokenSource) {
-    cancelTokenSource.cancel("Requete annulée par l'utilisateur")
-  }
-}
-
+/* ----------  REQUEST  ---------- */
 axiosInstance.interceptors.request.use(
   config => {
-    cancelTokenSource = axios.CancelToken.source()
-    config.cancelToken = cancelTokenSource.token
-    if (config.data instanceof FormData) {
-      config.headers['Content-Type'] = 'multipart/form-data'
-    } else {
-      config.headers['Content-Type'] = 'application/json'
-    }
-
-    const accessToken = localStorage.getItem(LocalStorageKeys.ACCESS_TOKEN)
-    const refreshToken = localStorage.getItem(LocalStorageKeys.REFRESH_TOKEN)
-
+    const accessToken = localStorage.getItem(LocalStorageKeys.ACCESS_TOKEN);
     if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
-    return config
+    return config;
   },
-  error => {
-    return Promise.reject(error)
-  }
-)
+  error => Promise.reject(error)
+);
 
+/* ----------  RESPONSE  ---------- */
 axiosInstance.interceptors.response.use(
-  response => {
-    //Ajouter ici les  middlewares
+  res => res,
+  async err => {
+    console.log({errorINtercept:err});
+    
+    const orig = err.config;
 
-    const { data } = response
+    // 1. 401 et pas déjà retry
+    if (err.response?.status === 401 && !orig._retry) {
+      orig._retry = true;
+      const refreshToken = localStorage.getItem(LocalStorageKeys.REFRESH_TOKEN);
 
-    // Si la session a expirée
-    if (response.data) {
-      if (!data.success && data.message === 'expired_token') {
-        alert('Session expirée, veuillez vous ré-identifier')
-        localStorage.removeItem(LocalStorageKeys.ACCESS_TOKEN)
-        location.reload()
+      if (!refreshToken) return Promise.reject(err); // pas de refresh → laisse tomber
+
+      try {
+        // 2. Demande nouvelle paire
+        const { data } = await axios.post(
+          `${axiosInstance.defaults.baseURL}/auth/refresh`,
+          { refreshToken },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        const { accessToken: newAccess, refreshToken: newRefresh } = data;
+
+        // 3. Sauvegarde
+        localStorage.setItem(LocalStorageKeys.ACCESS_TOKEN, newAccess);
+        localStorage.setItem(LocalStorageKeys.REFRESH_TOKEN, newRefresh);
+
+        // 4. Rejoue la requête initiale
+        orig.headers.Authorization = `Bearer ${newAccess}`;
+        return axiosInstance(orig);
+      } catch (refreshErr) {
+        // refresh raté → vrai logout
+        localStorage.removeItem(LocalStorageKeys.ACCESS_TOKEN);
+        localStorage.removeItem(LocalStorageKeys.REFRESH_TOKEN);
+        location.reload(); // ou redirect /login
+        return Promise.reject(refreshErr);
       }
     }
 
-    return response
-  },
-  error => {
-    return Promise.reject(error)
+    return Promise.reject(err);
   }
-)
+);

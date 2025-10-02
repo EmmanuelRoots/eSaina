@@ -23,9 +23,9 @@ export const NavBar = (props:Props) => {
     <nav style={{...defaultStyle, ...props.style}}>
       <div className="leftMenu">
       {
-        props.navItems.map((nav:NavItemProps) => {
+        props.navItems.map((nav:NavItemProps,index) => {
           return (
-            <NavItem {...nav}/>
+            <NavItem key={index} {...nav}/>
           )
         })
       }

@@ -5,7 +5,6 @@ import PublicRoute from './publicRouter'
 import { UseAuth } from '../context/user'
 
 const MainRouter = ()=> {
-    
     const {user} = UseAuth()
 
     return (
