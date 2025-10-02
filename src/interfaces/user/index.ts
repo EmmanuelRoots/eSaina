@@ -5,5 +5,5 @@ export interface UserActions {
     login: (credentials : LoginDTO | GoogleLoginDTO) => void
     logout: () => void
     user?: UserDTO
-    loading? : boolean
+    loading : boolean
 }

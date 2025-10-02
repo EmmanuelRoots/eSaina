@@ -43,17 +43,23 @@ const AuthProvider = (props: {children: JSX.Element}) => {
             alert(err.response.data.message)
             throw err; // 👈 important : pour que GenericForm attrape l'erreur
         } finally {
-            setLoading(false);
+            setTimeout(()=> {
+                setLoading(false);
+            },2000) //pour tester le loading
+            
         }
         
     }
     const logout = async () => {
+        setLoading(true)
         const res = await userApi.logOut()
         console.log({res});
         
         setUser(undefined)
         window.location.href = '/'
-
+        setTimeout(()=> {
+            setLoading(false);
+        },2000)
         return
     }
 
