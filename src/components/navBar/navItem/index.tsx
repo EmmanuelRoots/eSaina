@@ -36,7 +36,7 @@ export const NavItem = ({name,path,type,logo,style}:Props)=>{
   
     default:
       return (
-        <NavLink className="nav-item-hover" style={{...defaultStyle, ...style}} key={new Date().getTime()} to={path}><p>{name}</p></NavLink>
+        <NavLink className="nav-item-hover" style={{...defaultStyle, ...style}} key={new Date().getTime()} to={path}><p style={{fontSize:'1em'}}>{name}</p></NavLink>
       ) 
   }
 
