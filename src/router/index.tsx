@@ -11,8 +11,6 @@ const MainRouter = ()=> {
     const {user, loading} = UseAuth()
     const logo = logoFactory(80,80)
     const colors = useThemeColors()
-    console.log({loading});
-    
 
     if (loading) {
         return <LoadingPage logo={logo} height='100vh' spinnerSize={120} color={colors.primary}/>;
