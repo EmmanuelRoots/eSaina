@@ -4,6 +4,7 @@ import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layo
 import { LoadingPage } from "../loading"
 import { useThemeColors } from "../../hooks/theme"
 import { logoFactory } from "../../services/factory/logo.factory"
+import { ConversationDetail } from "../../components/conversation/conversationDetail"
 
 const MessagePage = ()=> {
   const colors = useThemeColors()
@@ -18,6 +19,7 @@ const MessagePage = ()=> {
         </LeftSection>
         <CenterSection style={{flex : "1 1 60%"}}>
           <h1>Message detail</h1>
+          <ConversationDetail />
         </CenterSection>
         <RightSection style={{flex : "1 1 20%"}}>
           <h1>Message menu</h1>

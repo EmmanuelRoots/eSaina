@@ -1,20 +1,17 @@
-import conversationApi from "../../services/api/conversation.api"
 import Row from "../row";
 import { InfiniteScroll } from "../infinite-scroll";
+import { UseConversation } from "../../context/conversation";
+import { useThemeColors } from "../../hooks/theme";
 
 export const Conversations = ()=> {
-  
-  const loadPage = async (page: number) => {
-    const res = await conversationApi.getAllConversation({ page, limit: 20 });
-    return { items: res.conversations, hasMore: res.pagination.hasMore };
-  };
-  
+  const {loadPage, selectConversation} = UseConversation()
+  const colors = useThemeColors()
 
   return (
     <Row>
       <InfiniteScroll
         loadPage={loadPage}
-        renderItem={(c) => <div key={c.id}>{c.title}</div>}
+        renderItem={(c) => <div key={c.id} style={{background:colors.primary}} onClick={()=>{selectConversation(c)}}>{c.title}</div>}
       />
     </Row>
   )

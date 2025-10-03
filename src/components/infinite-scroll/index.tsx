@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-type PageResult<T> = {
+export type PageResult<T> = {
   items: T[];
   hasMore: boolean;
 };

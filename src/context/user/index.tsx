@@ -7,7 +7,14 @@ import userApi from "../../services/api/user.api";
 import { LocalStorageKeys } from "../../constants/storage.constant";
 import { DEVICE_INFO } from "../../constants/deviceInfo";
 
-const userContext = createContext<UserActions>({} as UserActions)
+const defaultValue:UserActions = {
+    login : () => {/** */},
+    user : undefined,
+    logout : () => {/** */},
+    loading : false
+}
+
+const userContext = createContext<UserActions>(defaultValue)
 
 const AuthProvider = (props: {children: JSX.Element}) => {
     const [user,setUser] = useState<UserDTO | undefined>(undefined)
