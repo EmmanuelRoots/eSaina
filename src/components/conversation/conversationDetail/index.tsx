@@ -9,7 +9,7 @@ export const ConversationDetail = ()=> {
       {
         selectedConversation?.messages.map(m=>{
           return (
-            <div>
+            <div key={m.id}>
               {m.content}
             </div>
           )

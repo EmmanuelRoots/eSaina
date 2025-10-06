@@ -36,7 +36,7 @@ export const CardFooter: FC<CardSubProps> = ({ children, className = '' }) => (
 );
 
 /* ---------- Styles inline (facultatif) ---------- */
-const styles: Record<string, React.CSSProperties> = {
+const styles = {
   card: {
     display: 'flex',
     flexDirection: 'column',
@@ -59,4 +59,4 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: '1px solid #f0f0f0',
     backgroundColor: '#fafafa',
   },
-};
+} satisfies Record<string, React.CSSProperties>

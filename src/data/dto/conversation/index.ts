@@ -1,4 +1,5 @@
 import type { MessageDTO } from "../message"
+import type { UserDTO } from "../user"
 
 export enum ConversationType {
   REGULAR = 'REGULAR',
@@ -11,4 +12,5 @@ export interface ConversationDTO {
   type : ConversationType
   userId : string
   messages : MessageDTO []
+  owner : UserDTO
 }

@@ -25,6 +25,8 @@ const ConversationProvider = (props: {children: JSX.Element})=> {
 
   const loadPage =async (page: number) => {
       const res = await conversationApi.getAllConversation({ page, limit: 20 }).catch((err)=> {throw err});
+      console.log({res});
+      
       setConversation(res.conversations)
       setSelectedConversation(res.conversations[0])
       return { items: res.conversations, hasMore: res.pagination.hasMore };

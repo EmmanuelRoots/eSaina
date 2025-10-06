@@ -24,7 +24,6 @@ const AuthProvider = (props: {children: JSX.Element}) => {
         const token = localStorage.getItem(LocalStorageKeys.ACCESS_TOKEN)
         
         if(token) {
-            console.log({user});
             userApi.getUserByToken().then(res=>{
                 setUser(res.data)
             })
@@ -59,7 +58,7 @@ const AuthProvider = (props: {children: JSX.Element}) => {
     }
     const logout = async () => {
         setLoading(true)
-        const res = await userApi.logOut()
+        const res = await userApi.logOut().catch((err)=>{throw err})
         console.log({res});
         
         setUser(undefined)

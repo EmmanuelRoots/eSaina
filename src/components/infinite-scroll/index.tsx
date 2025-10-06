@@ -14,7 +14,6 @@ export type PageResult<T> = {
 type InfiniteScrollProps<T> = {
   loadPage: (page: number) => Promise<PageResult<T>>;
   renderItem: (item: T) => ReactNode;
-  className?: string;
   loader?: ReactNode;
   endMessage?: ReactNode;
 };
@@ -22,7 +21,6 @@ type InfiniteScrollProps<T> = {
 export function InfiniteScroll<T>({
   loadPage,
   renderItem,
-  className,
   loader = <p>Chargement…</p>,
   endMessage = <p>Plus rien à charger.</p>,
 }: InfiniteScrollProps<T>) {
@@ -60,16 +58,18 @@ export function InfiniteScroll<T>({
   }, [loadMore]);
 
   return (
-    <div className={className}>
-      {items.map((item, idx) => (
-        <div key={idx}>{renderItem(item)}</div>
+    <>
+      {items.map((item) => (
+        renderItem(item)
       ))}
 
       {/* sentinel */}
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       {loading && loader}
-      {!hasMore && items.length > 0 && endMessage}
-    </div>
+      <div>
+        {!hasMore && items.length > 0 && endMessage}
+      </div>
+    </>
   );
 }
