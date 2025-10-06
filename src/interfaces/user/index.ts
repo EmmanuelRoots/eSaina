@@ -4,6 +4,6 @@ import type { UserDTO } from "../../data/dto/user"
 export interface UserActions {
     login: (credentials : LoginDTO | GoogleLoginDTO) => void
     logout: () => void
-    user?: UserDTO
+    user?: UserDTO | undefined
     loading : boolean
 }

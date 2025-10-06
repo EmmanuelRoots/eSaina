@@ -1,17 +1,16 @@
 import { Card, CardBody } from "../../components/card"
 import Column from "../../components/column"
 import Row from "../../components/row"
-import { UseAuth } from "../../context/user"
 import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layout/section"
 
 const NewsPage = ()=> {
-  const {logout} = UseAuth()
+
 
   return (
     <SectionLayout style={{height:"100vh"}}>
       <RightSection style={{flex : "1 1 15%"}}>
         <aside style={{ background: "#333", color: "#fff" }}>
-          <button onClick={logout}>Deconnexion</button>
+          <button >Test</button>
         </aside>
       </RightSection>
       <CenterSection style={{flex : "1 1 70%", overflowY:"auto"}}>

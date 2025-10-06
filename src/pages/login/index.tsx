@@ -14,7 +14,7 @@ const LoginPage = ()=> {
     const {login} = UseAuth()
     const colors = useThemeColors()
     const fields = LoginFormFactory()
-    const logo = logoFactory(80,80)
+    const logo = logoFactory(200,200)
     const titleStyle = {
         color : colors.primaryBackground
     } as CSSProperties
