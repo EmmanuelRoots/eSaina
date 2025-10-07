@@ -5,6 +5,7 @@ import {PlusCircle} from 'lucide-react'
 import { useThemeColors } from "../../hooks/theme"
 import Button from "../../components/Button"
 import type { CSSProperties } from "react"
+import Text from "../../components/text"
 
 
 
@@ -24,18 +25,22 @@ const MessagePage = ()=> {
           </Button>
           <Conversations />
         </LeftSection>
-        <CenterSection style={{flex : "1 1 60%"}}>
-          <h3>Message detail</h3>
+        <CenterSection style={styles.centerStyle}>
+          <Text variant="Headline">Messages</Text>
           <ConversationDetail />
         </CenterSection>
-        <RightSection style={{flex : "1 1 20%"}}>
-          <h3>Message menu</h3>
+        <RightSection style={styles.rightStyle}>
+          <Text variant="Headline">Information</Text>
         </RightSection>
       </SectionLayout>
   )
 }
 
 const styles = {
+  centerStyle : {
+    flex : "1 1 60%",
+    padding : 8
+  },
   leftStyle : {
     flex : "1 1 20%", 
     height:"100vh",
@@ -46,6 +51,11 @@ const styles = {
     paddingInline: '1%',
     gap : 8,
     paddingTop : 8
+  },
+  rightStyle : {
+    flex : "1 1 20%",
+    boxShadow: '-2px 0 6px rgba(0,0,0,.08)',
+    padding : 8
   }
 
 } satisfies Record<string, React.CSSProperties>

@@ -2,6 +2,7 @@ import { UseConversation } from "../../../context/conversation"
 import {type ConversationDTO, ConversationType } from "../../../data/dto/conversation"
 import { Card, CardBody } from "../../card"
 import Row from "../../row"
+import Text from "../../text"
 
 type ConvItemProps = {
   conversation : ConversationDTO,
@@ -18,10 +19,10 @@ export const ConversationItem = ({conversation}:ConvItemProps)=>{
         <CardBody>
           {
             isIACHat ? (
-              <p>{conversation.title}</p>
+              <Text variant="body3">{conversation.title}</Text>
             ) :
             (
-              <p>{conversation.messages[0].user.firstName +' '+ conversation.messages[0].user.firstName}</p>
+              <Text variant="body3">{conversation.messages[0].user.firstName +' '+ conversation.messages[0].user.firstName}</Text>
             )
           }
         </CardBody>

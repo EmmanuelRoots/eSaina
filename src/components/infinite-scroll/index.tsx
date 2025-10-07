@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Text from "../text";
 
 export type PageResult<T> = {
   items: T[];
@@ -22,7 +23,7 @@ export function InfiniteScroll<T>({
   loadPage,
   renderItem,
   loader = <p>Chargement…</p>,
-  endMessage = <p>Plus rien à charger.</p>,
+  endMessage = (<Text variant="caption">Plus rien à charger.</Text>),
 }: InfiniteScrollProps<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(1);
