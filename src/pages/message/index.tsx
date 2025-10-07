@@ -20,8 +20,8 @@ const MessagePage = ()=> {
   return (
       <SectionLayout>
         <LeftSection style={styles.leftStyle}>
-          <Button icon={<PlusCircle color={colors.primaryBackground} size={30}/>} style={buttonStyle} title="Créer conversation">
-            Créer conversation
+          <Button icon={<PlusCircle color={colors.primaryBackground} size={30}/>} style={buttonStyle} onClick={()=>{}}>
+            <Text color="primaryBackground">Créer conversation</Text>
           </Button>
           <Conversations />
         </LeftSection>

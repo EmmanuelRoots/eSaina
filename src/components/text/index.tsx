@@ -3,7 +3,7 @@ import { Colors } from "../../constants/colors"
 import { useThemeColors } from "../../hooks/theme"
 
 const styles = {
-  body3: {
+  body: {
     fontSize: "0.8rem",
     lineHeight: 1,
     fontWeight : "regular"
@@ -43,7 +43,7 @@ const Text = ({variant, color, style, ...rest}:TextProps)=> {
   const colors = useThemeColors()
 
   return (
-    <p style={{...styles[variant?? 'body3'], color : colors[color ?? "default"],...style}} {...rest}></p>
+    <p style={{...styles[variant?? 'body'], color : colors[color ?? "default"],...style}} {...rest}></p>
   )
 }
 

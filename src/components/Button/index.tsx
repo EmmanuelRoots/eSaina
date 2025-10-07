@@ -6,12 +6,13 @@ type ButtonProps = HTMLAttributes<HTMLButtonElement> & {
   children : ReactNode,
   icon ? : ReactNode,
   style ? : CSSProperties,
-  hoverColor? : string
+  hoverColor? : string,
+  onClick : ()=>void
 }
 
 
 
-const Button = ({children, icon, style, hoverColor, ...rest}:ButtonProps)=>{
+const Button = ({children, icon, style, onClick, hoverColor, ...rest}:ButtonProps)=>{
   const colors = useThemeColors()
 
   const defaultStyle = {
@@ -26,7 +27,7 @@ const Button = ({children, icon, style, hoverColor, ...rest}:ButtonProps)=>{
   } as CSSProperties
 
   return (
-    <button className="btn-hover" {...rest} style={{...defaultStyle,...style}}>
+    <button className="btn-hover" {...rest} style={{...defaultStyle,...style}} onClick={onClick}>
       {icon && (icon)}
       {children}
     </button>

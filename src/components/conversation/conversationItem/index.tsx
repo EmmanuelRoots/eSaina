@@ -19,10 +19,10 @@ export const ConversationItem = ({conversation}:ConvItemProps)=>{
         <CardBody>
           {
             isIACHat ? (
-              <Text variant="body3">{conversation.title}</Text>
+              <Text variant="body">{conversation.title}</Text>
             ) :
             (
-              <Text variant="body3">{conversation.messages[0].user.firstName +' '+ conversation.messages[0].user.firstName}</Text>
+              <Text variant="body">{conversation.messages[0].user.firstName +' '+ conversation.messages[0].user.firstName}</Text>
             )
           }
         </CardBody>
