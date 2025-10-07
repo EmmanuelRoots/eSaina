@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { ModalContext } from "../../context/modal"
+import './index.css'
 
 type ModalProps = {
   isOpen: boolean

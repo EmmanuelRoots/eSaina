@@ -1,0 +1,8 @@
+.modal-body {
+  padding: 8px 28px 28px 28px;
+  color: #6b7280;
+  overflow-y: auto;
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.6;
+}

@@ -1,3 +1,5 @@
+import './index.css'
+
 type ModalBodyProps = {
   children: React.ReactNode
 }

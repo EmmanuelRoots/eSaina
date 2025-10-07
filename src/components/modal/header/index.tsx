@@ -1,5 +1,6 @@
 import { useModalContext } from "../../../context/modal"
 import { CheckIcon, ErrorIcon, InfoIcon, WarningIcon } from "../iconModal"
+import './index.css'
 
 type ModalHeaderProps = {
   children: React.ReactNode

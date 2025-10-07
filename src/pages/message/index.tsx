@@ -4,8 +4,15 @@ import { ConversationDetail } from "../../components/conversation/conversationDe
 import {PlusCircle} from 'lucide-react'
 import { useThemeColors } from "../../hooks/theme"
 import Button from "../../components/Button"
-import type { CSSProperties } from "react"
+import { useState, type CSSProperties } from "react"
 import Text from "../../components/text"
+import Modal from "../../components/modal"
+import ModalHeader from "../../components/modal/header"
+import { ModalBody } from "../../components/modal/body"
+import { ModalFooter } from "../../components/modal/footer"
+import AutoCompleteGeneric from "../../components/autoComplete"
+import userApi from "../../services/api/user.api"
+import type { UserDTO } from "../../data/dto/user"
 
 
 
@@ -17,10 +24,14 @@ const MessagePage = ()=> {
     color : colors.primaryBackground
   }
 
+  const [open,setOpen] = useState<boolean>(false)
+  const UserAutoComplete = AutoCompleteGeneric<UserDTO>
+
   return (
+    <>
       <SectionLayout>
         <LeftSection style={styles.leftStyle}>
-          <Button icon={<PlusCircle color={colors.primaryBackground} size={30}/>} style={buttonStyle} onClick={()=>{}}>
+          <Button icon={<PlusCircle color={colors.primaryBackground} size={30}/>} style={buttonStyle} onClick={()=>{setOpen(true)}}>
             <Text color="primaryBackground">Créer conversation</Text>
           </Button>
           <Conversations />
@@ -33,6 +44,22 @@ const MessagePage = ()=> {
           <Text variant="Headline">Information</Text>
         </RightSection>
       </SectionLayout>
+      <Modal isOpen={open} onClose={() => setOpen(false)} size="lg">
+        <ModalHeader><Text variant="Headline">Créer une conversation</Text></ModalHeader>
+        <ModalBody>
+          <UserAutoComplete 
+            fetchSuggestions={(page, limit, query) => userApi.searchUser({ page, limit, searchTerm: query })}
+            getSuggestionLabel={(u)=>u.firstName + u.lastName}
+            onSelect={(s)=>console.log(s)}
+            getSuggestionKey={(u)=>u.id}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={() => setOpen(false)} style={{padding:"2%", backgroundColor : colors.primary}}><Text color="primaryBackground">Annuler</Text></Button>
+          <Button onClick={() => setOpen(false)} style={{padding:"2%", backgroundColor : colors.secondary}}><Text color="primaryBackground">Créer la conversation</Text></Button>
+        </ModalFooter>
+      </Modal>
+    </>
   )
 }
 
