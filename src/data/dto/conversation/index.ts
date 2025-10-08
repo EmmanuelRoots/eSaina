@@ -2,8 +2,9 @@ import type { MessageDTO } from "../message"
 import type { UserDTO } from "../user"
 
 export enum ConversationType {
-  REGULAR = 'REGULAR',
-  AI_CHAT = 'AI_CHAT'
+  AI_CHAT = 'AI_CHAT',
+  DIRECT = 'DIRECT',
+  GROUP = 'GROUP'
 }
 
 export interface ConversationDTO {

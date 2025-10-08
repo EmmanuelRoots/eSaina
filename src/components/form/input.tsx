@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CSSProperties } from "react";
 import type { FieldConfig } from "../../interfaces/components/form";
+import AutoComplete from "../autoComplete";
 
 const defaultStyle = {
   container: {
@@ -79,7 +80,7 @@ const defaultStyle = {
     borderRadius: "0.375rem",
     transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
     outline: "none",
-    appearance: "none" as const
+    appearance: "none" as const,
   },
   checkbox: {
     width: "1em",
@@ -146,7 +147,8 @@ const Input = <T extends Record<string, any>>({
   inputStyle,
   labelStyle,
   onChange,
-  onBlur
+  onBlur,
+  onSelect,
 }: {
   field: FieldConfig<T>;
   value: any;
@@ -156,6 +158,7 @@ const Input = <T extends Record<string, any>>({
   inputStyle? : CSSProperties,
   labelStyle? : CSSProperties,
   onBlur: () => void;
+  onSelect? : (value :any)=> void,
 }) => {
   const getInputStyle = () => {
     let style = { ...defaultStyle.input, ...inputStyle || {} };
@@ -268,6 +271,17 @@ const Input = <T extends Record<string, any>>({
             ))}
           </div>
         );
+
+      case "autoComplete" :
+        return (
+          <AutoComplete
+            data={field.data!}
+            getSuggestionLabel={field.getSuggestionLabel!}
+            getSuggestionKey={field.getSuggestionKey!}
+            onSelect={(item)=>onSelect && onSelect(item as any)}
+            onInputChange={field.onInputChange}
+          />
+        )
 
       default:
         return (
