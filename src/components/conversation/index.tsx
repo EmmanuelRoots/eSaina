@@ -3,12 +3,19 @@ import { UseConversation } from "../../context/conversation";
 import { ConversationItem } from "./conversationItem";
 
 export const Conversations = ()=> {
-  const {loadPage} = UseConversation()
+  const {loadPage,conversations, page, hasMore, loading} = UseConversation()
+  console.log({loading});
+  
+  
 
   return (
       <InfiniteScroll
-        loadPage={loadPage}
+        items={conversations}
+        loadMore={loadPage}
         renderItem={(c) => <ConversationItem key={c.id} conversation={c}/>}
+        page={page}
+        hasMore={hasMore}
+        loading= {loading}
       />
   )
 }

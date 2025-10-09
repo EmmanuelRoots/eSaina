@@ -7,6 +7,11 @@ export enum ConversationType {
   GROUP = 'GROUP'
 }
 
+export enum MemberRole {
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER'
+}
+
 export interface ConversationDTO {
   id? : string
   title? : string
@@ -14,4 +19,13 @@ export interface ConversationDTO {
   userId : string
   messages : MessageDTO []
   owner : UserDTO
+  members : Partial<ConversationMember> []
+}
+
+export interface ConversationMember {
+  id : string
+  conversationId: string
+  userId :string
+  role : MemberRole
+  joinedAt : string
 }

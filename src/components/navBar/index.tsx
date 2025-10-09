@@ -5,6 +5,7 @@ import { NavItem } from "./navItem"
 import './index.css'
 import { UseAuth } from "../../context/user"
 import { useThemeColors } from "../../hooks/theme"
+import { useSSE } from "../../hooks/sse"
 
 type Props = {
   style? : CSSProperties
@@ -22,6 +23,9 @@ const defaultStyle = {
 
 export const NavBar = (props:Props) => {
   const {logout,user} = UseAuth()
+  // console.log({user});
+  
+  const {isConnected} = useSSE(user?.id?.toString() || '')
   const colors = useThemeColors()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

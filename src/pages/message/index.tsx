@@ -13,11 +13,13 @@ import userApi from "../../services/api/user.api"
 import type { UserDTO } from "../../data/dto/user"
 import GenericForm from "../../components/form"
 import { conversationFromFactory } from "../../services/factory/createConversation.factory"
-import { type ConversationDTO } from "../../data/dto/conversation"
+import { ConversationType, MemberRole, type ConversationDTO } from "../../data/dto/conversation"
+import conversationApi from "../../services/api/conversation.api"
+import { UseConversation } from "../../context/conversation"
 
 const MessagePage = () => {
   const colors = useThemeColors()
-
+  const {pushConversation} = UseConversation()
   const initialValues : Partial<ConversationDTO> = {
     title : '',
     userId : ''
@@ -60,8 +62,24 @@ const MessagePage = () => {
   const getLabel = (u:Partial<UserDTO>) => `${u.firstName} ${u.lastName}`
   const getKey = (u:Partial<UserDTO>) => u.id!.toString()
   const createConvFields = conversationFromFactory({data:users,getSuggestionLabel:getLabel,getSuggestionKey:getKey,onAutoCompleteSelect:()=>{/** */}, onInputChange:handleInputChange})
-  const handleSubmit = (conv:Partial<ConversationDTO>)=> {
-    console.log({conv})
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = (conv:any)=> {
+    // console.log({conv})
+    const newConv:Partial<ConversationDTO> = {
+      userId : conv.userId.id,
+      title : conv.title,
+      type : ConversationType.DIRECT,
+      members : [{
+        userId : conv.userId.id,
+        role : MemberRole.MEMBER
+      }]
+    }
+    conversationApi.createConversation(newConv).then(res=>{
+      console.log({res});
+    }).finally(()=>{
+      setOpen(false)
+      pushConversation()
+    })
     
   }
 

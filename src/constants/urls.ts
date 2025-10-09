@@ -8,6 +8,10 @@ export const urls = {
     SEARCH_USER : '/user/search-user'
   },
   conversation : {
-    GET_ALL: `/conversation/all-conversation`
+    GET_ALL: `/conversation/all-conversation`,
+    CREATE: `/conversation/create`
+  },
+  notification : {
+    SEND:'notification/send',
   }
 }

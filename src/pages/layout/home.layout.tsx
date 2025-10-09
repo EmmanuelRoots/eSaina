@@ -9,7 +9,6 @@ import Row from "../../components/row";
 import { useThemeColors } from "../../hooks/theme";
 
 const HomeLayout = () => {
-    //const {logout} = UseAuth()
     const navItems = navBarFactory()
     const colors = useThemeColors()
     
@@ -20,18 +19,6 @@ const HomeLayout = () => {
           <NavBar navItems={navItems}/>
         </Row>
         <Outlet/>
-        {/* <Row style={{height:"100vh"}}>
-          
-          <Column className="sidebar" style={{flex : "1 1 15%"}}>
-            <aside style={{ background: "#333", color: "#fff" }}>
-              <button onClick={logout}>Deconnexion</button>
-            </aside>
-          </Column>
-          <Column className="main-content" style={{flex : "1 1 70%", overflowY:"auto"}}>
-            <Outlet/>
-          </Column>
-          <Column className="sidebar" style={{flex : "1 1 15%"}}></Column>
-        </Row> */}
       </Column>
   );
 }   

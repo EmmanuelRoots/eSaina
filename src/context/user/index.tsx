@@ -58,8 +58,8 @@ const AuthProvider = (props: {children: JSX.Element}) => {
     }
     const logout = async () => {
         setLoading(true)
-        const res = await userApi.logOut().catch((err)=>{throw err})
-        console.log({res});
+        await userApi.logOut().catch((err)=>{throw err})
+        // console.log({res});
         
         setUser(undefined)
         window.location.href = '/'
