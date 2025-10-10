@@ -4,7 +4,7 @@ import { useThemeColors } from "../../hooks/theme"
 
 const styles = {
   body: {
-    fontSize: "0.8rem",
+    fontSize: "1rem",
     lineHeight: 1,
     fontWeight : "regular"
   },

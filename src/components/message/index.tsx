@@ -12,7 +12,7 @@ export const MessageItem = (message:MessageDTO) => {
   return (
     <Row style={{justifyContent : isMine ? 'flex-end' : 'flex-start'}}>
       <Row style={{padding:'1%', flex:"0 1 50%", backgroundColor: isMine ? colors.primary : colors.secondary, borderRadius : 8}}>
-        <Text>{message.content}</Text>
+        <Text color="primaryBackground" variant="body">{message.content}</Text>
       </Row>
     </Row>
   )

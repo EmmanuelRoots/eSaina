@@ -75,6 +75,7 @@ export function InfiniteScroll<T>({
       {direction === 'top' && userScrolledUp && hasMore && (
         <>
           {loading && <p>Chargement en haut…</p>}
+          {!hasMore && items.length > 0 && <p>Plus rien à charger.</p>}
           <div ref={sentinel} style={{ height: 1 }} />
         </>
       )}
