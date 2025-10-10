@@ -3,7 +3,7 @@ import { UseConversation } from "../../context/conversation";
 import { ConversationItem } from "./conversationItem";
 
 export const Conversations = ()=> {
-  const {loadPage,conversations, page, hasMore, loading} = UseConversation()
+  const {loadPage,conversations, hasMore, loading} = UseConversation()
   console.log({loading});
   
   
@@ -13,7 +13,6 @@ export const Conversations = ()=> {
         items={conversations}
         loadMore={loadPage}
         renderItem={(c) => <ConversationItem key={c.id} conversation={c}/>}
-        page={page}
         hasMore={hasMore}
         loading= {loading}
       />

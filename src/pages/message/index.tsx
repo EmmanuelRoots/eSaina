@@ -1,30 +1,18 @@
+import { useState, type CSSProperties } from "react"
+
 import { Conversations } from "../../components/conversation"
 import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layout/section"
 import { ConversationDetail } from "../../components/conversation/conversationDetail"
 import { PlusCircle } from 'lucide-react'
 import { useThemeColors } from "../../hooks/theme"
 import Button from "../../components/Button"
-import { useCallback, useEffect, useState, type CSSProperties } from "react"
 import Text from "../../components/text"
-import Modal from "../../components/modal"
-import ModalHeader from "../../components/modal/header"
-import { ModalBody } from "../../components/modal/body"
-import userApi from "../../services/api/user.api"
-import type { UserDTO } from "../../data/dto/user"
-import GenericForm from "../../components/form"
-import { conversationFromFactory } from "../../services/factory/createConversation.factory"
-import { ConversationType, MemberRole, type ConversationDTO } from "../../data/dto/conversation"
-import conversationApi from "../../services/api/conversation.api"
+import CreateConversationModal from "../../components/conversation/createConversation"
 import { UseConversation } from "../../context/conversation"
 
 const MessagePage = () => {
   const colors = useThemeColors()
   const {pushConversation} = UseConversation()
-  const initialValues : Partial<ConversationDTO> = {
-    title : '',
-    userId : ''
-  }
-
   
   const buttonStyle: CSSProperties = {
     backgroundColor: colors.secondary,
@@ -33,77 +21,12 @@ const MessagePage = () => {
   }
 
   const [open, setOpen] = useState<boolean>(false)
-  const [users, setUsers] = useState<UserDTO[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const fetchUser = useCallback(async (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      return
-    }
 
-    setLoading(true)
-    try {
-      const res = await userApi.searchUser({ 
-        page: 1, 
-        limit: 10, 
-        searchTerm 
-      })
-      setUsers(res)
-    } catch (err) {
-      console.error('Erreur lors de la recherche:', err)
-      setUsers([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-  const handleInputChange = useCallback((query: string) => {
-    fetchUser(query)
-  }, [fetchUser])
-  
-  const getLabel = (u:Partial<UserDTO>) => `${u.firstName} ${u.lastName}`
-  const getKey = (u:Partial<UserDTO>) => u.id!.toString()
-  const createConvFields = conversationFromFactory({data:users,getSuggestionLabel:getLabel,getSuggestionKey:getKey,onAutoCompleteSelect:()=>{/** */}, onInputChange:handleInputChange})
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = (conv:any)=> {
-    // console.log({conv})
-    const newConv:Partial<ConversationDTO> = {
-      userId : conv.userId.id,
-      title : conv.title,
-      type : ConversationType.DIRECT,
-      members : [{
-        userId : conv.userId.id,
-        role : MemberRole.MEMBER
-      }]
-    }
-    conversationApi.createConversation(newConv).then(res=>{
-      console.log({res});
-    }).finally(()=>{
-      setOpen(false)
-      pushConversation()
-    })
-    
+  const handleFinished = ()=> {
+    pushConversation()
   }
-
-  useEffect(() => {
-    const loadInitialUsers = async () => {
-      setLoading(true)
-      try {
-        const res = await userApi.searchUser({ 
-          page: 1, 
-          limit: 10, 
-          searchTerm: '' 
-        })
-        setUsers(res)
-      } catch (err) {
-        console.error('Erreur lors du chargement initial:', err)
-        setUsers([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadInitialUsers()
-  }, [])  
-
+  
+  
   return (
     <>
       <SectionLayout>
@@ -125,39 +48,7 @@ const MessagePage = () => {
           <Text variant="Headline">Information</Text>
         </RightSection>
       </SectionLayout>
-
-      <Modal isOpen={open} onClose={() => setOpen(false)} size="lg">
-        <ModalHeader>
-          <Text variant="Headline">Créer une conversation</Text>
-        </ModalHeader>
-        <ModalBody>
-          <GenericForm 
-            fields={createConvFields}
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-            submitText="Créer la conversation"
-          />
-        </ModalBody>
-        {/* <ModalFooter>
-          <Button 
-
-  const [open, setOpen] = useState<boolean>(false)
-  const [users, setUsers] = useState<UserDTO[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
-
-            onClick={() => setOpen(false)} 
-            style={{ padding: "2%", backgroundColor: colors.primary }}
-          >
-            <Text color="primaryBackground">Annuler</Text>
-          </Button>
-          <Button 
-            onClick={() => setOpen(false)} 
-            style={{ padding: "2%", backgroundColor: colors.secondary }}
-          >
-            <Text color="primaryBackground">Créer la conversation</Text>
-          </Button>
-        </ModalFooter> */}
-      </Modal>
+      {open && <CreateConversationModal open={open} oncClose={()=>setOpen(false)} onFinished={handleFinished}/>}
     </>
   )
 }

@@ -10,7 +10,6 @@ const defaultStyle = {
     justifyContent: "space-between" as const,
     gap: 10,
     alignItems: "center" as const,
-    marginBottom: "1rem"
   },
   label: {
     marginBottom: "0.5rem",

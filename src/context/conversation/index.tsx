@@ -18,7 +18,7 @@ type PageResult<T> ={
 /* Types                                                              */
 /* ------------------------------------------------------------------ */
 interface ConversationAction {
-  loadPage: (page: number) => Promise<PageResult<Partial<ConversationDTO>>>;
+  loadPage: () => Promise<PageResult<Partial<ConversationDTO>>>;
   conversations: Partial<ConversationDTO>[];
   selectedConversation: Partial<ConversationDTO> | null;
   selectConversation: (conv: Partial<ConversationDTO>) => void;
@@ -48,34 +48,27 @@ const conversationContext = createContext<ConversationAction>({
 const ConversationProvider = (props: { children: JSX.Element }) => {
   /* ---------- état local ---------- */
   const [conversations, setConversations] = useState<Partial<ConversationDTO>[]>([]);
-  const [selectedConversation, setSelectedConversation] =
-    useState<Partial<ConversationDTO> | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<Partial<ConversationDTO> | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0); // déclenche un re-chargement
-
   
 
   /* ---------- chargement d’une page (paginatif ou reset) ---------- */
   const loadPage = useCallback(
-    async (nextPage: number)  => {
+    async ()  => {
       console.log('--- call this ---');
       
       if (loading) return { items: [], hasMore };
 
       setLoading(true);
       try {
-        const { conversations: fetched, pagination } =
-          await conversationApi.getAllConversation({ page: nextPage, limit: 20 });
-
-        if (nextPage === 1) {
-          setConversations(fetched);
-          setPage(1);
-        } else {
-          setConversations((prev) => [...prev, ...fetched]);
-          setPage(nextPage);
-        }
+        const { conversations: fetched, pagination } = await conversationApi.getAllConversation({ page: page, limit: 20 });
+        
+        selectConversation(fetched[0])
+        setConversations(fetched)
+        setPage(prev => prev+1)
         setHasMore(pagination.hasMore);
         return { items: fetched, hasMore: pagination.hasMore };
       } finally {
@@ -87,8 +80,11 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   );
   useEffect(()=>{
         console.log('initialize');
-        loadPage(1)
-        
+        loadPage().then(()=>{
+          console.log({selectedConversation});
+          
+        })
+       
     },[])
   /* ---------- sélection ---------- */
   const selectConversation = useCallback((conv: Partial<ConversationDTO>) => {
@@ -96,16 +92,16 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   }, []);
 
   /* ---------- déclenchement via SSE ---------- */
-  const pushConversation = useCallback(() => {
+  const pushConversation = () => {
     console.log('push conversation');
     
     setRefreshFlag((f) => f + 1); // simple toggle
-  }, []);
+  }
 
   /* ---------- effet : recharge page 1 quand on reçoit un signal ---------- */
   useEffect(() => {
     if (refreshFlag === 0) return; // évite le 1er rendu
-    loadPage(1);
+    loadPage();
   }, [refreshFlag, loadPage]);
 
 

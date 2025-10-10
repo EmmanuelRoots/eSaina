@@ -43,6 +43,7 @@ const GenericForm = <T extends Record<string, any>>({
     if (validate(fields)) {
       try {
         await onSubmit(values);
+        reset()
       } catch (error) {
         console.error('Erreur lors de la soumission:', error);
       }

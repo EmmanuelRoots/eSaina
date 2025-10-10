@@ -5,11 +5,11 @@ import type { MessageDTO } from '../../data/dto/message';
 import { UseConversation } from '../../context/conversation';
 
 export const useSSE = (userId: string) =>{
-  console.log({userId});
   const {pushConversation} = UseConversation()
   
   const [notifications, setNotifications] = useState<NotificationDTO[]>([])
   const [messages, setMessages] = useState<MessageDTO[]>([])
+  const [newMessage, setNeMessage] = useState<number>(0)
   const [isConnected, setIsConnected] = useState(false)
   const eventSourceRef = useRef<EventSource | null>(null)
 
@@ -36,7 +36,10 @@ export const useSSE = (userId: string) =>{
       setNotifications((prev) => [notification, ...prev]);
     });
 
-    es.addEventListener('new-message', (e) => {
+    es.addEventListener('NEW_MESSAGE', (e) => {
+      const data = JSON.parse(e.data);
+      console.log('✅ New message', data);
+      setNeMessage(prev=>prev+1)
       const message: MessageDTO = JSON.parse(e.data);
       setMessages((prev) => [message, ...prev]);
     });
@@ -59,5 +62,5 @@ export const useSSE = (userId: string) =>{
     };
   }, [userId]);
 
-  return { notifications, messages, isConnected };
+  return { notifications, messages, isConnected, newMessage };
 }
