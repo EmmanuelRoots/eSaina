@@ -28,12 +28,7 @@ export function InfiniteScroll<T>({
     if (!el) return;
 
     const onScroll = () => {
-      
       const isNearTop = el.scrollTop < -40;
-      console.log(el.scrollTop);
-      
-      console.log({isNearTop});
-      
       setUserScrolledUp(isNearTop);
     };
 
@@ -42,16 +37,9 @@ export function InfiniteScroll<T>({
   }, []);
   
   useEffect(() => {
-    
-    console.log({sentinel,loading,hasMore});
-    
     if (!sentinel.current || loading || !hasMore) return;
-    console.log('ato');
-    
     const obs = new IntersectionObserver(
       ([entry]) => {
-        console.log({entry});
-        
         if (entry.isIntersecting) loadMore()
       },
       { root: scrollContainerRef.current!, rootMargin: '100px' }

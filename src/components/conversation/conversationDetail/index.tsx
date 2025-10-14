@@ -32,19 +32,28 @@ export const ConversationDetail = ()=> {
   }
 
   const handleSubmit = (content:string | undefined)=>{
+    setLoading(true)
     if(content) {
       const newMessage:MessageDTO = {
         content : content,
         conversation : selectedConversation as ConversationDTO,
-        sender : selectedConversation?.type === ConversationType.AI_CHAT ? SenderType.AI : SenderType.USER,
+        sender : SenderType.USER,
         type : MessageType.TEXT,
         user : user as UserDTO
       }
-  
+
+      if(selectedConversation?.type === ConversationType.AI_CHAT){
+        setMessages(prev=>[newMessage,...prev])
+      }
+      
       conversationApi.sendMessage(newMessage).then(res=>{
         console.log({res});
-        
+        setLoading(false)
         fetchMessages(selectedConversation?.id ?? '')
+      }).catch(err=>{
+        console.error(err)
+      }).finally(()=>{
+        setLoading(false)
       })
       
     }
@@ -89,8 +98,6 @@ export const ConversationDetail = ()=> {
 
   return (
     <Column>
-    {
-      loading ? <div>loading...</div> : (
         <Column style={{height:"80vh", gap:8}}>
           <InfiniteScroll
             items={messages}
@@ -101,10 +108,8 @@ export const ConversationDetail = ()=> {
             direction="top"
           />
         </Column>
-      )
-    }
-      
       <Row style={{justifyContent:"flex-end"}}>
+      {loading && (<p>loading...</p>)}
         <GenericForm 
           fields={fields}
           initialValues={initialValues}

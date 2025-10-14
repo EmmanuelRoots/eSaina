@@ -19,9 +19,9 @@ const createConversation = async (conversation : Partial<ConversationDTO>)=>{
 }
 
 const sendMessage = async(message : MessageDTO)=>{
-  console.log({message});
-  
-  const {data} = await axiosInstance.post(urls.conversation.SEND_MESSAGE,{...message}).catch((err)=> {throw err})
+  const {data} = await axiosInstance.post(urls.conversation.SEND_MESSAGE,{...message}).catch((err)=> {
+    throw err
+  })
 
   return data
 }
