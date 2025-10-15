@@ -1,0 +1,104 @@
+/* ==========  VARIABLES (THEME CLAIR)  ========== */
+.autocomplete-container {
+  --ac-bg: #ffffff;
+  --ac-border: #d1d5db;
+  --ac-border-focus: #3b82f6;
+  --ac-text: #111827;
+  --ac-subtle: #6b7280;
+  --ac-hover: #f3f4f6;
+  --ac-highlight: #dbeafe;
+  --ac-radius: 10px;
+  --ac-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+  --ac-transition: .18s ease;
+}
+
+/* ==========  INPUT  ========== */
+.autocomplete-input {
+  width: 100%;
+  padding: .7rem 1rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--ac-text);
+  background: var(--ac-bg);
+  border: 1.5px solid var(--ac-border);
+  border-radius: var(--ac-radius);
+  outline: none;
+  transition: border-color var(--ac-transition), box-shadow var(--ac-transition);
+}
+
+.autocomplete-input:focus {
+  border-color: var(--ac-border-focus);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ac-border-focus) 18%, transparent);
+}
+
+.autocomplete-input:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+  color: var(--ac-subtle);
+}
+
+/* ==========  LISTE (portée dans <body>)  ========== */
+.autocomplete-list {
+  margin: 0;
+  padding: .4rem 0;
+  list-style: none;
+  border: 1px solid var(--ac-border);
+  box-shadow: var(--ac-shadow);
+  animation: fadeIn .16s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ac-subtle) transparent;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========  ITEMS  ========== */
+.autocomplete-item {
+  padding: .6rem 1rem;
+  cursor: pointer;
+  color: var(--ac-text);
+  transition: background var(--ac-transition);
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.highlighted {
+  background: var(--ac-hover);
+}
+
+.autocomplete-item.highlighted {
+  font-weight: 600;
+}
+
+.autocomplete-item:active {
+  background: var(--ac-highlight);
+}
+
+/* ==========  SCROLLBAR  ========== */
+.autocomplete-list::-webkit-scrollbar {
+  width: 6px;
+}
+.autocomplete-list::-webkit-scrollbar-thumb {
+  background: var(--ac-subtle);
+  border-radius: 3px;
+}
+
+/* ==========  DARK MODE  ========== */
+@media (prefers-color-scheme: dark) {
+  .autocomplete-container {
+    --ac-bg: #1f2937;
+    --ac-border: #374151;
+    --ac-border-focus: #60a5fa;
+    --ac-text: #f9fafb;
+    --ac-subtle: #9ca3af;
+    --ac-hover: #374151;
+    --ac-highlight: #1e40af;
+    --ac-shadow: 0 6px 22px rgba(0, 0, 0, .25);
+  }
+}
+
+/* ==========  MOBILE  ========== */
+@media (max-width: 640px) {
+  .autocomplete-input { font-size: 16px; }   /* évite zoom iOS */
+}

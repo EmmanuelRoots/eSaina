@@ -1,7 +1,6 @@
 import type { ConversationDTO } from "../conversation"
 import type { UserDTO } from "../user"
 
-
 export enum MessageType {
   TEXT = 'TEXT',
   IMAGE = 'IMAGE',
@@ -15,9 +14,10 @@ export enum SenderType {
 }
 
 export interface MessageDTO {
+  id? : string
   content : string
   type : MessageType
-  senderType : SenderType
+  sender : SenderType
+  user : Partial<UserDTO>
   conversation : ConversationDTO
-  user : UserDTO
 }

@@ -1,18 +1,20 @@
-import Row from "../row";
 import { InfiniteScroll } from "../infinite-scroll";
 import { UseConversation } from "../../context/conversation";
-import { useThemeColors } from "../../hooks/theme";
+import { ConversationItem } from "./conversationItem";
 
 export const Conversations = ()=> {
-  const {loadPage, selectConversation} = UseConversation()
-  const colors = useThemeColors()
+  const {loadPage,conversations, hasMore, loading} = UseConversation()
+  console.log({loading});
+  
+  
 
   return (
-    <Row>
       <InfiniteScroll
-        loadPage={loadPage}
-        renderItem={(c) => <div key={c.id} style={{background:colors.primary}} onClick={()=>{selectConversation(c)}}>{c.title}</div>}
+        items={conversations}
+        loadMore={loadPage}
+        renderItem={(c) => <ConversationItem key={c.id} conversation={c}/>}
+        hasMore={hasMore}
+        loading= {loading}
       />
-    </Row>
   )
 }

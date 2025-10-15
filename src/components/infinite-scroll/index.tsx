@@ -1,75 +1,82 @@
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from 'react';
 
-export type PageResult<T> = {
+
+type Props<T> = {
   items: T[];
+  loadMore: () => void
   hasMore: boolean;
-};
-
-type InfiniteScrollProps<T> = {
-  loadPage: (page: number) => Promise<PageResult<T>>;
-  renderItem: (item: T) => ReactNode;
-  className?: string;
-  loader?: ReactNode;
-  endMessage?: ReactNode;
+  loading: boolean;
+  renderItem: (item: T) => React.ReactNode;
+  direction?: 'top' | 'bottom';
 };
 
 export function InfiniteScroll<T>({
-  loadPage,
+  items,
+  loadMore,
+  hasMore,
+  loading,
   renderItem,
-  className,
-  loader = <p>Chargement…</p>,
-  endMessage = <p>Plus rien à charger.</p>,
-}: InfiniteScrollProps<T>) {
-  const [items, setItems] = useState<T[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  direction = 'bottom',
+}: Props<T>) {
+  const sentinel = useRef<HTMLDivElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [userScrolledUp, setUserScrolledUp] = useState(false);
 
-  const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
-      const { items: newItems, hasMore: more } = await loadPage(page);
-      setItems((prev) => [...prev, ...newItems]);
-      setHasMore(more);
-      setPage((p) => p + 1);
-    } catch (e) {
-      console.error(e);
-      // on peut aussi exposer une onError prop si on veut
-    } finally {
-      setLoading(false);
-    }
-  }, [page, loading, hasMore, loadPage]);
 
   useEffect(() => {
-    const el = sentinelRef.current;
+    const el = scrollContainerRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => entries[0].isIntersecting && loadMore(),
-      { rootMargin: "100px" }
+
+    const onScroll = () => {
+      const isNearTop = el.scrollTop < -40;
+      setUserScrolledUp(isNearTop);
+    };
+
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+  
+  useEffect(() => {
+    if (!sentinel.current || loading || !hasMore) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMore()
+      },
+      { root: scrollContainerRef.current!, rootMargin: '100px' }
     );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadMore]);
+
+    obs.observe(sentinel.current);
+    return () => obs.disconnect();
+  }, [loading, hasMore, loadMore, userScrolledUp]);
 
   return (
-    <div className={className}>
-      {items.map((item, idx) => (
-        <div key={idx}>{renderItem(item)}</div>
-      ))}
+    <div
+      ref={scrollContainerRef}
+      style={{
+        height: '100%',
+        overflowY: 'auto',
+        display: 'flex',
+        gap : 8,
+        flexDirection: direction === 'top' ? 'column-reverse' : 'column',
+      }}
+    >
+      {direction === 'top' && userScrolledUp && hasMore && (
+        <>
+          {loading && <p>Chargement en haut…</p>}
+          {!hasMore && items.length > 0 && <p>Plus rien à charger.</p>}
+          <div ref={sentinel} style={{ height: 1 }} />
+        </>
+      )}
 
-      {/* sentinel */}
-      <div ref={sentinelRef} style={{ height: 1 }} />
+      {items.map(renderItem)}
 
-      {loading && loader}
-      {!hasMore && items.length > 0 && endMessage}
+      {direction === 'bottom' && (
+        <>
+          <div ref={sentinel} style={{ height: 1 }} />
+          {hasMore && loading && <p>Chargement…</p>}
+          {!hasMore && items.length > 0 && <p>Plus rien à charger.</p>}
+        </>
+      )}
     </div>
   );
 }

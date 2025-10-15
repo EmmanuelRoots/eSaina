@@ -30,9 +30,16 @@ const logOut = async () => {
   return res
 }
 
+const searchUser = async ({page=1,limit=20,searchTerm=''}:{page:number, limit:number, searchTerm:string}) =>{
+  const {data} = await axiosInstance.get(urls.user.SEARCH_USER,{params:{searchTerm,page,limit}}).catch((err)=> {throw err})
+
+  return data.data
+}
+
 export default {
   logUser,
   getUserByToken,
   logOut,
-  googleLogin
+  googleLogin,
+  searchUser
 }

@@ -7,11 +7,15 @@ import { navBarFactory } from "../../services/factory/navBar.factory";
 import Column from "../../components/column";
 import Row from "../../components/row";
 import { useThemeColors } from "../../hooks/theme";
+import { UseAuth } from "../../context/user";
+import { useSSE } from "../../hooks/sse";
 
 const HomeLayout = () => {
-    //const {logout} = UseAuth()
     const navItems = navBarFactory()
     const colors = useThemeColors()
+    const {user} = UseAuth()
+    const {isConnected} = useSSE(user?.id ?? '')
+    console.log(isConnected);
     
 
     return (
@@ -20,18 +24,6 @@ const HomeLayout = () => {
           <NavBar navItems={navItems}/>
         </Row>
         <Outlet/>
-        {/* <Row style={{height:"100vh"}}>
-          
-          <Column className="sidebar" style={{flex : "1 1 15%"}}>
-            <aside style={{ background: "#333", color: "#fff" }}>
-              <button onClick={logout}>Deconnexion</button>
-            </aside>
-          </Column>
-          <Column className="main-content" style={{flex : "1 1 70%", overflowY:"auto"}}>
-            <Outlet/>
-          </Column>
-          <Column className="sidebar" style={{flex : "1 1 15%"}}></Column>
-        </Row> */}
       </Column>
   );
 }   

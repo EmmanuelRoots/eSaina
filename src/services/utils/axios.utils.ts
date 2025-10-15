@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import { LocalStorageKeys } from '../../constants/storage.constant';
+import { urls } from '../../constants/urls';
 
 export const axiosInstance: AxiosInstance = axios.create({
   timeout: 30000,
@@ -22,8 +23,6 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   res => res,
   async err => {
-    console.log({errorINtercept:err});
-    
     const orig = err.config;
 
     // 1. 401 et pas déjà retry
@@ -36,11 +35,11 @@ axiosInstance.interceptors.response.use(
       try {
         // 2. Demande nouvelle paire
         const { data } = await axios.post(
-          `${axiosInstance.defaults.baseURL}/auth/refresh`,
+          `${axiosInstance.defaults.baseURL}${urls.user.REFRESH_TOKEN}`,
           { refreshToken },
           { headers: { 'Content-Type': 'application/json' } }
         );
-
+        
         const { accessToken: newAccess, refreshToken: newRefresh } = data;
 
         // 3. Sauvegarde
@@ -49,12 +48,16 @@ axiosInstance.interceptors.response.use(
 
         // 4. Rejoue la requête initiale
         orig.headers.Authorization = `Bearer ${newAccess}`;
+
         return axiosInstance(orig);
       } catch (refreshErr) {
         // refresh raté → vrai logout
+        
+        console.error(refreshErr)
         localStorage.removeItem(LocalStorageKeys.ACCESS_TOKEN);
         localStorage.removeItem(LocalStorageKeys.REFRESH_TOKEN);
         location.reload(); // ou redirect /login
+        //throw refreshErr
         return Promise.reject(refreshErr);
       }
     }

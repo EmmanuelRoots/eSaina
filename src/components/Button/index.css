@@ -1,0 +1,15 @@
+.btn-hover {
+  cursor: pointer;
+  transition: filter 0.2s ease, background-color 0.2s ease;
+}
+
+/* le survol lit la valeur injectée en JS */
+.btn-hover:hover:not(:disabled) {
+  background-color: var(--hover-bg);
+  filter: brightness(1.15);
+}
+
+.btn-hover:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
