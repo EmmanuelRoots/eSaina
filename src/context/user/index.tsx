@@ -49,10 +49,10 @@ const AuthProvider = (props: {children: JSX.Element}) => {
             alert(err.response.data.message)
             throw err; // 👈 important : pour que GenericForm attrape l'erreur
         } finally {
-            setTimeout(()=> {
-                setLoading(false);
-            },2000) //pour tester le loading
-            
+            // setTimeout(()=> {
+            //     setLoading(false);
+            // },2000) //pour tester le loading
+            setLoading(false)
         }
         
     }
