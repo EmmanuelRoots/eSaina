@@ -61,7 +61,7 @@ export const NavBar = (props:Props) => {
       </div>
       <div className="rightMenu">
         <div className="user-menu" ref={dropdownRef} >
-          <img src="avatar.jpg" className="avatar" />
+          <img src={user?.pdpUrl} className="pdp" />
           <span>{user?.firstName} {user?.lastName}</span>
           <button onClick={toggleDropdown} className="dropdown-toggle">
             ▼

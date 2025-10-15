@@ -5,4 +5,5 @@ export interface UserDTO {
   email: string
   created_at: string
   updated_at: string
+  pdpUrl?:  string
 }
