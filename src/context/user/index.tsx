@@ -36,7 +36,7 @@ const AuthProvider = (props: {children: JSX.Element}) => {
         try {
             if('family_name' in credentials || 'given_name' in credentials){
                 console.log('google auth');
-                res = await userApi.googleLogin({family_name: (credentials as GoogleLoginDTO).family_name, email : credentials.email, given_name : credentials.given_name, deviceInfo : DEVICE_INFO.platform} as GoogleLoginDTO)
+                res = await userApi.googleLogin({family_name: (credentials as GoogleLoginDTO).family_name, email : credentials.email, given_name : credentials.given_name, deviceInfo : DEVICE_INFO.platform, picture: (credentials as GoogleLoginDTO).picture} as GoogleLoginDTO)
             }else {
                 res = await userApi.logUser({...credentials,deviceInfo:DEVICE_INFO.platform})
             }
@@ -49,10 +49,10 @@ const AuthProvider = (props: {children: JSX.Element}) => {
             alert(err.response.data.message)
             throw err; // 👈 important : pour que GenericForm attrape l'erreur
         } finally {
-            setTimeout(()=> {
-                setLoading(false);
-            },2000) //pour tester le loading
-            
+            // setTimeout(()=> {
+            //     setLoading(false);
+            // },2000) //pour tester le loading
+            setLoading(false)
         }
         
     }
