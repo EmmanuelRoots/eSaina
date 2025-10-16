@@ -19,7 +19,8 @@ export interface ConversationDTO {
   userId : string
   messages : MessageDTO []
   owner : UserDTO
-  members : Partial<ConversationMember> []
+  members : Partial<ConversationMember> [],
+  read : boolean
 }
 
 export interface ConversationMember {

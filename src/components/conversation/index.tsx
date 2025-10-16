@@ -1,6 +1,7 @@
 import { InfiniteScroll } from "../infinite-scroll";
 import { UseConversation } from "../../context/conversation";
 import { ConversationItem } from "./conversationItem";
+import Column from "../column";
 
 export const Conversations = ()=> {
   const {loadPage,conversations, hasMore, loading} = UseConversation()
@@ -9,6 +10,7 @@ export const Conversations = ()=> {
   
 
   return (
+    <Column style={{height:'80vh'}}>
       <InfiniteScroll
         items={conversations}
         loadMore={loadPage}
@@ -16,5 +18,6 @@ export const Conversations = ()=> {
         hasMore={hasMore}
         loading= {loading}
       />
+    </Column>
   )
 }
