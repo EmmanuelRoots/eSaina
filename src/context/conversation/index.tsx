@@ -65,10 +65,13 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
       setLoading(true);
       try {
         const { conversations: fetched, pagination } = await conversationApi.getAllConversation({ page: page, limit: 20 });
+        console.log({pagination});
         
         selectConversation(fetched[0])
         setConversations(fetched)
-        setPage(prev => prev+1)
+        if(pagination.hasMore){
+          setPage(prev => prev+1)
+        }
         setHasMore(pagination.hasMore);
         return { items: fetched, hasMore: pagination.hasMore };
       } finally {
