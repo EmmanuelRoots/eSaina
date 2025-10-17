@@ -43,6 +43,8 @@ const AuthProvider = (props: {children: JSX.Element}) => {
             localStorage.setItem(LocalStorageKeys.ACCESS_TOKEN,res.data.accessToken)
             localStorage.setItem(LocalStorageKeys.REFRESH_TOKEN,res.data.refreshToken)
             const usr = await userApi.getUserByToken()
+            console.log({usr});
+            
             setUser(usr.data)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err:any) {

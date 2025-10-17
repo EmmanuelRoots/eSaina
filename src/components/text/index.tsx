@@ -14,12 +14,13 @@ const styles = {
     fontWeight: "bold"
   },
   caption:{
-    fontSize: "0.6rem",
-    lineHeight: 1
+    fontSize: "0.8rem",
+    lineHeight: 1,
+    fontWeight: 'lighter'
   },
   subtitle1 : {
-    fontSize : 14,
-    lineHeight : 16,
+    fontSize :"1.15rem",
+    lineHeight : 1.5,
     fontWeight : "bold"
   },
   subtitle2 : {
