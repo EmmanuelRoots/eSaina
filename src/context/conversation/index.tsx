@@ -14,9 +14,6 @@ type PageResult<T> ={
   hasMore : boolean
 }
 
-/* ------------------------------------------------------------------ */
-/* Types                                                              */
-/* ------------------------------------------------------------------ */
 interface ConversationAction {
   loadPage: () => Promise<PageResult<Partial<ConversationDTO>>>;
   conversations: Partial<ConversationDTO>[];
@@ -28,9 +25,7 @@ interface ConversationAction {
   hasMore : boolean
 }
 
-/* ------------------------------------------------------------------ */
-/* Contexte                                                           */
-/* ------------------------------------------------------------------ */
+
 const conversationContext = createContext<ConversationAction>({
   loadPage: async () => ({ items: [], hasMore: false }),
   conversations: [],
@@ -42,11 +37,9 @@ const conversationContext = createContext<ConversationAction>({
   hasMore: false,
 });
 
-/* ------------------------------------------------------------------ */
-/* Provider                                                           */
-/* ------------------------------------------------------------------ */
+
 const ConversationProvider = (props: { children: JSX.Element }) => {
-  /* ---------- état local ---------- */
+  
   const [conversations, setConversations] = useState<Partial<ConversationDTO>[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Partial<ConversationDTO> | null>(null);
   const [loading, setLoading] = useState(false);
@@ -54,8 +47,6 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   const [hasMore, setHasMore] = useState(true);
   const [refreshFlag, setRefreshFlag] = useState(0); // déclenche un re-chargement
   
-
-  /* ---------- chargement d’une page (paginatif ou reset) ---------- */
   const loadPage = useCallback(
     async ()  => {
       console.log('--- call this ---');
@@ -89,26 +80,25 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
         })
        
     },[])
-  /* ---------- sélection ---------- */
+  
   const selectConversation = useCallback((conv: Partial<ConversationDTO>) => {
     setSelectedConversation(conv);
   }, []);
 
-  /* ---------- déclenchement via SSE ---------- */
+ 
   const pushConversation = () => {
     console.log('push conversation');
     
     setRefreshFlag((f) => f + 1); // simple toggle
   }
 
-  /* ---------- effet : recharge page 1 quand on reçoit un signal ---------- */
+  
   useEffect(() => {
     if (refreshFlag === 0) return; // évite le 1er rendu
     loadPage();
   }, [refreshFlag, loadPage]);
 
 
-  /* ---------- valeur fournie ---------- */
   const value: ConversationAction = {
     loadPage,
     conversations,
@@ -127,8 +117,5 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   );
 };
 
-/* ------------------------------------------------------------------ */
-/* Hook consommateur                                                    */
-/* ------------------------------------------------------------------ */
 export const UseConversation = () => useContext(conversationContext);
 export default ConversationProvider

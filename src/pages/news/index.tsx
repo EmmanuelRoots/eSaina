@@ -1,10 +1,14 @@
 
 import Column from "../../components/column"
 import PostComponent from "../../components/posts"
+import { UsePost } from "../../context/post"
 import  { type PostDTO, PostType } from "../../data/dto/post"
 import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layout/section"
 
 const NewsPage = ()=> {
+  const {loading}=UsePost()
+  console.log(loading);
+  
   const mockPosts = [...Array(200)].map((_, index) => {
     return {
       id : index,

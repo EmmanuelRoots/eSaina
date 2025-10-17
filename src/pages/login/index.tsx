@@ -34,7 +34,7 @@ const LoginPage = ()=> {
 
     const onSuccess = (res : CredentialResponse)=>{
         const googleUser = jwtDecode(res.credential || '') as GoogleLoginDTO
-        console.log({googleUser})
+        // console.log({res})
         login(googleUser)
        
     }
