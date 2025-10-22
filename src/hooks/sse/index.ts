@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import type { NotificationDTO } from '../../data/dto/notification'
 import type { MessageDTO } from '../../data/dto/message';
 import { UseConversation } from '../../context/conversation';
+import { UseAuth } from '../../context/user';
 
-export const useSSE = (userId: string) =>{
+export const useSSE = () =>{
   const {pushConversation} = UseConversation()
+  const {user} = UseAuth()
   
   const [notifications, setNotifications] = useState<NotificationDTO[]>([])
   const [messages, setMessages] = useState<MessageDTO[]>([])
@@ -14,9 +16,9 @@ export const useSSE = (userId: string) =>{
   const eventSourceRef = useRef<EventSource | null>(null)
 
   useEffect(() => {
-    if (!userId) return;
+    if (!user?.id) return;
 
-    const url = `${import.meta.env.VITE_BASE_URL}/notification/stream?userId=${userId}`;
+    const url = `${import.meta.env.VITE_BASE_URL}/notification/stream?userId=${user?.id}`;
     const es = new EventSource(url);
 
     es.addEventListener('CONNECTED', (e) => {
@@ -44,7 +46,7 @@ export const useSSE = (userId: string) =>{
       setMessages((prev) => [message, ...prev]);
     });
 
-    es.addEventListener('broadcast', (e) => {
+    es.addEventListener('BROADCAST', (e) => {
       const broadcast: NotificationDTO = JSON.parse(e.data);
       setNotifications((prev) => [broadcast, ...prev]);
     });
@@ -60,7 +62,7 @@ export const useSSE = (userId: string) =>{
       es.close();
       setIsConnected(false);
     };
-  }, [userId]);
+  },[]);
 
   return { notifications, messages, isConnected, newMessage };
 }

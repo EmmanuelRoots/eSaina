@@ -43,7 +43,6 @@ const styles = {
     border: '1px solid #e5e5e5',
     borderRadius: 8,
     boxShadow: '0 2px 6px rgba(0,0,0,.08)',
-    overflow: 'hidden',
   },
   header: {
     padding: '12px 16px',

@@ -9,9 +9,9 @@ import { UseAuth } from "../../../context/user";
 import type { UserDTO } from "../../../data/dto/user";
 import conversationApi from "../../../services/api/conversation.api";
 import { useCallback, useEffect, useState } from "react";
-import { useSSE } from "../../../hooks/sse";
 import { InfiniteScroll } from "../../infinite-scroll";
 import { MessageItem } from "../../message";
+import { UseSSE } from "../../../context/sse";
 
 export const ConversationDetail = ()=> {
   const {selectedConversation} = UseConversation()
@@ -20,7 +20,7 @@ export const ConversationDetail = ()=> {
   const [hasMore, setHasMore] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1);
   const {user} = UseAuth()
-  const {newMessage} = useSSE(user?.id??'')
+  const {newMessage} = UseSSE()
   const fields : FieldConfig<Partial<MessageDTO>>[] = [{
     name : 'content',
     type : 'text',
@@ -103,7 +103,7 @@ export const ConversationDetail = ()=> {
             items={messages}
             hasMore ={hasMore}
             loadMore={loadMore}
-            renderItem={(c)=>(<MessageItem key={c.id} {...c}/>)}
+            renderItem={(c)=>(<div key={c.id}><MessageItem message={c}/></div>)}
             loading={loading}
             direction="top"
           />

@@ -25,6 +25,7 @@ export function InfiniteScroll<T>({
 
   useEffect(() => {
     const el = scrollContainerRef.current;
+    
     if (!el) return;
 
     const onScroll = () => {
@@ -37,6 +38,7 @@ export function InfiniteScroll<T>({
   }, []);
   
   useEffect(() => {
+    
     if (!sentinel.current || loading || !hasMore) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
@@ -70,11 +72,11 @@ export function InfiniteScroll<T>({
 
       {items.map(renderItem)}
 
-      {direction === 'bottom' && (
+      {direction === 'bottom' && hasMore && (
         <>
-          <div ref={sentinel} style={{ height: 1 }} />
           {hasMore && loading && <p>Chargement…</p>}
           {!hasMore && items.length > 0 && <p>Plus rien à charger.</p>}
+          <div ref={sentinel} style={{ height: 1 }} />
         </>
       )}
     </div>

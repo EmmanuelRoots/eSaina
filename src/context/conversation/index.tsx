@@ -9,7 +9,7 @@ import {
 import type { ConversationDTO } from "../../data/dto/conversation";
 import conversationApi from "../../services/api/conversation.api";
 
-type PageResult<T> ={
+export type PageResult<T> ={
   items : T[]
   hasMore : boolean
 }
@@ -42,9 +42,9 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   
   const [conversations, setConversations] = useState<Partial<ConversationDTO>[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Partial<ConversationDTO> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const [refreshFlag, setRefreshFlag] = useState(0); // déclenche un re-chargement
   
   const loadPage = useCallback(
@@ -63,8 +63,8 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
         if(pagination.hasMore){
           setPage(prev => prev+1)
         }
-        setHasMore(pagination.hasMore);
-        return { items: fetched, hasMore: pagination.hasMore };
+        setHasMore(pagination.hasMore)
+        return { items: fetched, hasMore: pagination.hasMore }
       } finally {
         setLoading(false);
         setRefreshFlag(0)

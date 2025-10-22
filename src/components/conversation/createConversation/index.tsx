@@ -107,19 +107,19 @@ const CreateConversationModal = ({open, oncClose, onFinished}:CreateConvModalPro
 
   return (
     <Modal isOpen={open} onClose={oncClose} size="lg">
-        <ModalHeader>
-          <Text variant="Headline">Créer une conversation</Text>
-        </ModalHeader>
-        <ModalBody>
-          <GenericForm 
-            fields={createConvFields}
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-            submitText="Créer la conversation"
-            loading = {loading}
-          />
-        </ModalBody>
-      </Modal>
+      <ModalHeader>
+        <Text variant="Headline">Créer une conversation</Text>
+      </ModalHeader>
+      <ModalBody>
+        <GenericForm 
+          fields={createConvFields}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          submitText="Créer la conversation"
+          loading = {loading}
+        />
+      </ModalBody>
+    </Modal>
   )
 }
 
