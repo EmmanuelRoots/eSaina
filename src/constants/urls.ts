@@ -14,6 +14,14 @@ export const urls = {
     GET_ALL_MESSAGE : `/conversation/get-all-messages`
   },
   notification : {
-    SEND:'notification/send',
-  }
+    SEND:'/notification/send',
+  },
+  salon : {
+    GET_USER_SALON : `/salon/get-user-salon`,
+  },
+  post : {
+    GET_POST_SALON : `/post/get-salon-post`,
+    CREATE_POST : `/post/create-post`,
+    ADD_REACTION : `/post/add-reaction`,
+  },
 }

@@ -7,15 +7,14 @@ import { navBarFactory } from "../../services/factory/navBar.factory";
 import Column from "../../components/column";
 import Row from "../../components/row";
 import { useThemeColors } from "../../hooks/theme";
-import { UseAuth } from "../../context/user";
-import { useSSE } from "../../hooks/sse";
+import { UseSSE } from "../../context/sse";
 
 const HomeLayout = () => {
     const navItems = navBarFactory()
     const colors = useThemeColors()
-    const {user} = UseAuth()
-    const {isConnected} = useSSE(user?.id ?? '')
-    console.log(isConnected);
+    const {isConnected} = UseSSE()
+
+    console.log({isConnected});
     
 
     return (

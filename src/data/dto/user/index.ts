@@ -1,3 +1,5 @@
+import type { RoleDTO } from "../role"
+
 export interface UserDTO {
   id: string
   firstName: string
@@ -6,4 +8,5 @@ export interface UserDTO {
   created_at: string
   updated_at: string
   pdpUrl?:  string
+  role? : RoleDTO
 }
