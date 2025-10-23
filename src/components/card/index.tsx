@@ -14,23 +14,23 @@ export const Card: FC<CardProps> = ({ children, style}) => {
 };
 
 /* ---------- CardHeader ---------- */
-type CardSubProps = { children: ReactNode; className?: string };
-export const CardHeader: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-header ${className}`} style={styles.header}>
+type CardSubProps = { children: ReactNode; style? : CSSProperties };
+export const CardHeader: FC<CardSubProps> = ({ children, style}) => (
+  <div className={`card-header`} style={{...styles.header, ...style}}>
     {children}
   </div>
 );
 
 /* ---------- CardBody ---------- */
-export const CardBody: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-body ${className}`} style={styles.body}>
+export const CardBody: FC<CardSubProps> = ({ children, style }) => (
+  <div className={`card-body`} style={{...styles.body, ...style}}>
     {children}
   </div>
 );
 
 /* ---------- CardFooter ---------- */
-export const CardFooter: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-footer ${className}`} style={styles.footer}>
+export const CardFooter: FC<CardSubProps> = ({ children, style}) => (
+  <div className={`card-footer`} style={{...styles.footer, ...style}}>
     {children}
   </div>
 );
