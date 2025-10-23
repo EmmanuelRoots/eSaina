@@ -14,8 +14,14 @@ const createPost = async(payload:Partial<PostDTO>)=>{
   return data
 }
 
-const addRecation = async(payload: ReactionDTO)=>{
+const addRecation = async(payload: Partial<ReactionDTO>)=>{
   const {data} = await axiosInstance.post(urls.post.ADD_REACTION,payload).catch((err)=>{throw err})
+
+  return data
+}
+
+const deleteReaction = async(reactionId: string) => {
+  const {data} = await axiosInstance.delete(urls.post.DELETE_REACTION,{params:{reactionId}}).catch((err)=>{throw err})
 
   return data
 }
@@ -23,5 +29,6 @@ const addRecation = async(payload: ReactionDTO)=>{
 export default {
   getSalonPost,
   createPost,
-  addRecation
+  addRecation,
+  deleteReaction
 }
