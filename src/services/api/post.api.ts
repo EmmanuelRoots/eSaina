@@ -1,5 +1,5 @@
 import { urls } from "../../constants/urls"
-import type { PostDTO, ReactionDTO } from "../../data/dto/post"
+import type { CommentDTO, PostDTO, ReactionDTO } from "../../data/dto/post"
 import { axiosInstance } from "../utils/axios.utils"
 
 const getSalonPost = async(salonId:string, page=1, limit=10)=>{
@@ -26,9 +26,23 @@ const deleteReaction = async(reactionId: string) => {
   return data
 }
 
+const createComment = async(payload: Partial<CommentDTO>) =>{
+  const {data} = await axiosInstance.post(urls.post.CREATE_COMMENT,payload).catch((err)=>{throw err})
+
+  return data
+}
+
+const getComments = async (postId:string) =>{
+  const {data} = await axiosInstance.get(urls.post.GET_COMMENTS,{params:{postId}}).catch((err)=>{throw err})
+
+  return data
+}
+
 export default {
   getSalonPost,
   createPost,
   addRecation,
-  deleteReaction
+  deleteReaction,
+  createComment,
+  getComments
 }

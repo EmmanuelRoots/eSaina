@@ -23,6 +23,8 @@ export const urls = {
     GET_POST_SALON : `/post/get-salon-post`,
     CREATE_POST : `/post/create-post`,
     ADD_REACTION : `/post/add-reaction`,
-    DELETE_REACTION : `/post/delete-reaction`
+    DELETE_REACTION : `/post/delete-reaction`,
+    CREATE_COMMENT : `/post/create-comment`,
+    GET_COMMENTS : `/post/get-comments`,
   },
 }
