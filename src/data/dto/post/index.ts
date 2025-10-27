@@ -43,6 +43,7 @@ export interface CommentDTO {
   post : Partial<PostDTO>
   parent? : CommentDTO
   replies? : CommentDTO[]
+  reactions? : ReactionDTO []
   createdAt : string
 }
 

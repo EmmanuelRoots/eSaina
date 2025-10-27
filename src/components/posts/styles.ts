@@ -66,5 +66,13 @@ export const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
+  },
+  likesIcon : {
+    backgroundColor:'#1877f2', 
+    width:'20px', 
+    height:'20px', 
+    justifyContent:'center', 
+    alignItems:'center',
+    borderRadius : '50%'
   }
 } satisfies { [key: string]: React.CSSProperties }

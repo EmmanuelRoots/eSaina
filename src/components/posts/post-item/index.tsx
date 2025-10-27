@@ -38,7 +38,6 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
 
 
   const handleLiked = ()=> {
-    
     if(!liked){ //onliking
       const newReactions:Partial<ReactionDTO> = {
         post,
@@ -54,7 +53,6 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
           setMyReaction(undefined)
         })
       }
-      
     }
     setLiked(prev=>!prev)
   }
