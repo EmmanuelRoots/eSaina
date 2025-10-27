@@ -8,6 +8,11 @@ const styles = {
     lineHeight: 1,
     fontWeight : "regular"
   },
+  body2:{
+    fontSize: "0.9rem",
+    lineHeight: 1,
+    fontWeight : "regular"
+  },
   Headline:{
     fontSize: "1.17rem",
     lineHeight: 2,
@@ -24,13 +29,13 @@ const styles = {
     fontWeight : "bold"
   },
   subtitle2 : {
-    fontSize : 12,
-    lineHeight: 16,
+    fontSize : "1.13rem",
+    lineHeight: 1.3,
     fontWeight : "bold"
   },
   subtitle3 : {
-    fontSize : 10,
-    lineHeight : 16,
+    fontSize : "1.05rem",
+    lineHeight : 1.1,
     fontWeight : "bold"
   }
 } satisfies Record<string, React.CSSProperties>

@@ -38,7 +38,6 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
 
 
   const handleLiked = ()=> {
-    
     if(!liked){ //onliking
       const newReactions:Partial<ReactionDTO> = {
         post,
@@ -54,7 +53,6 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
           setMyReaction(undefined)
         })
       }
-      
     }
     setLiked(prev=>!prev)
   }
@@ -87,6 +85,9 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
             </Row>
             <Text>{reactions.length}</Text>
           </Row>
+          <Row>
+            <Text>{post.comments.length >1? `${post.comments.length} commentaires` : `${post.comments.length} commentaire`}</Text>
+          </Row>
         </Row>
         <CardFooter style={{borderRadius: '0 0 8px 8px'}}>
           <Row>
@@ -109,7 +110,7 @@ const PostItem = ({post, ...rest}:PostItemProps)=>{
             </button>
           </Row>
         </CardFooter>
-        {showComments && <Comments comments={post.comments}/>}
+        {showComments && <Comments post={post}/>}
       </Card>
       
     </>
@@ -158,7 +159,9 @@ const styles = {
     borderRadius : '50%'
   },
   postStat : {
-    padding : '1%'
+    padding : '0.9rem',
+    justifyContent : 'space-between',
+    alignItems : 'baseline'
   }
 } satisfies { [key: string]: React.CSSProperties }
 
