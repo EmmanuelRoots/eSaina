@@ -20,7 +20,7 @@ export const CommentNode = ({node, depth}:CommentNodeProps)=>{
   const [showRep, setShowRep] = useState<boolean>(false)
   const [replies, setReplies] = useState<CommentDTO[]>(node.replies ?? [])
   const [reactions, setReactions] = useState<ReactionDTO[]>(node.reactions ?? [])
-  const [myReaction, setMyReaction] = useState<ReactionDTO | undefined>(reactions.find(r=>r.user?.id === user?.id) ?? undefined)
+  const [myReaction, setMyReaction] = useState<ReactionDTO | undefined>(reactions.find(r=>r.user?.id === user?.id && r.comment.id === node.id) ?? undefined)
   const pad = depth * 1.5;
   const handlePublish = (commentText:string)=>{
     console.log({node});
@@ -83,23 +83,23 @@ export const CommentNode = ({node, depth}:CommentNodeProps)=>{
             <Text variant="subtitle3">{user?.firstName +' '+ user?.lastName}</Text>
             <Text variant="body2">{node.content}</Text>
           </Column>
-          <Row style={{padding:'0.5rem', justifyContent:'space-between'}}>
+          <Row style={{padding:'0.5rem', justifyContent:'space-between', alignItems: 'center'}}>
             <Row gap={12}>
               <button style={styles.commentAction} onClick={handleLiked}><Text color={liked ? 'likedText' : 'secondaryText'} variant="body2" style={{fontWeight:600}}>J'aime</Text></button>
               <button style={styles.commentAction}><Text color="secondaryText" variant="body2" style={{fontWeight:600}} onClick={()=>setShowRep(prev=>!prev)}>Répondre</Text></button>
               <Text variant="body2" color="secondaryText">{getTimeBetweenTwoDate(node.createdAt)}</Text>
             </Row>
             <Row gap={8} style={{alignItems:'center'}}>
-              <Text variant="body2">{node.replies?.length && node.replies?.length >1 ? `${node.replies?.length} réponses` : `${node.replies?.length} réponse`}</Text>
+              <Text variant="body2">{replies.length && replies.length >1 ? `${replies.length} réponses` : `${replies.length} réponse`}</Text>
               {
-                reactions.length && (
+                reactions.length ? (
                   <Row style={{alignItems:'center'}} gap={8}>
                     <Row style={styles.likesIcon}>
                       <ThumbsUp size={12} color="white" fill="white" />
                     </Row>
                     <Text>{reactions.length}</Text>
                   </Row>
-                )
+                ) : null
               }
             </Row>
           </Row>

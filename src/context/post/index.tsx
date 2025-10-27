@@ -39,13 +39,8 @@ const PostProvider = (props: { children: JSX.Element }) => {
   const [salons, setSalons] = useState<SalonDTO[]>([])
   const [posts, setPosts] = useState<PostDTO[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  // const [newPost, setNewPost] = useState<number>(0)
-  // const [page, setPage] = useState(1)
-  // const [hasMore, setHasMore] = useState(false)
 
   useEffect(() => {
-    console.log('---------------------- Init post context ----------------------------')
-    
     getSalonByUser().then(res=>{
       console.log({res});
       if (res.data?.length >0){
@@ -55,20 +50,10 @@ const PostProvider = (props: { children: JSX.Element }) => {
       }
     })
   }, [])
-
-  // useEffect(()=>{
-    
-  //   if(newPost === 0){
-  //     return
-  //   }
-  //   console.log({selectedSalon})
-  //   if(selectedSalon?.id){
-  //     // getPostListBySalon()
-  //   }
-    
-  // },[newPost])
   
   useEffect(() => {
+    console.log('select salon', selectedSalon);
+    
     if (selectedSalon?.id) {
       // getPostListBySalon();
     } else {
@@ -90,47 +75,6 @@ const PostProvider = (props: { children: JSX.Element }) => {
 
   const selectSalon = (salon: SalonDTO) => setSelectedSalon(salon);
 
-  // const getPostListBySalon = async () => {
-  //   // console.log({page});
-    
-  //   // setLoading(true)
-  //   // try {
-  //   //   if (!selectedSalon?.id){
-  //   //     return { items: [], hasMore: false }
-  //   //   } 
-  //   //   const { data: fetched, pagination } = await postApi.getSalonPost(selectedSalon?.id,page)
-  //   //   if(pagination.hasMore){
-  //   //     setPage(prev => prev+1)
-  //   //   }
-  //   //   if(posts.length){
-  //   //     setPosts(prev=>[...prev, ...fetched])
-  //   //   }else{
-  //   //     setPosts(fetched ?? [])
-  //   //   }
-      
-  //   //   setHasMore(pagination.hasMore)
-
-  //   //   return { items: fetched, hasMore: pagination.hasMore }
-  //   // } finally {
-  //   //   setLoading(false)
-  //   // }
-  // }
-
-  // const refreshPost = ()=>{
-   
-    
-  //   setNewPost(prev=>prev+1)
-  // }
-
-  
-  // const resetPage = async ()=> {
-  //   setPosts([]) 
-  //   setPage(1)
-  //   console.log({selectedSalon});
-  //   await getPostListBySalon()
-    
-  // }
-
   const value: PostActionProps = {
     selectedSalon,
     selectSalon,
@@ -138,7 +82,6 @@ const PostProvider = (props: { children: JSX.Element }) => {
     salons,
     posts,
     loading,
-    // refreshPost,
   }
 
   return (

@@ -1,6 +1,5 @@
-
-import Column from "../../components/column"
 import PostComponent from "../../components/posts"
+import SalonComponent from "../../components/salon-component"
 
 import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layout/section"
 
@@ -31,15 +30,15 @@ const NewsPage = ()=> {
   return (
     <SectionLayout>
       <RightSection style={{flex : "1 1 20%"}}>
-        <aside style={{ background: "#333", color: "#fff" }}>
-          <button >Test</button>
-        </aside>
+        <SalonComponent />
       </RightSection>
       <CenterSection style={{flex : "1 1 65%"}}>
         <PostComponent/>
       </CenterSection>
       <LeftSection style={{flex : "1 1 15%"}}>
-        <Column ></Column>
+        <aside style={{ background: "#333", color: "#fff" }}>
+          <button >Test</button>
+        </aside>
       </LeftSection>
     </SectionLayout>
   )
