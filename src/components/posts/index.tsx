@@ -8,6 +8,7 @@ import { UsePost } from "../../context/post"
 import { InfiniteScroll } from "../infinite-scroll"
 import postApi from "../../services/api/post.api"
 import { UseSSE } from "../../context/sse"
+import { CanDoAction } from "../../services/utils/role.utils"
 
 
 // type PostComponentProps = HTMLAttributes<HTMLDivElement> & {
@@ -20,6 +21,8 @@ const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
   const [posts,setPosts] = useState<PostDTO[]>([])
   const [hasMorePost, setHasMorePost] = useState<boolean>(false)
   const {newPost} = UseSSE()
+  const canCreatePost = CanDoAction("Post","create")
+  
   const page = useRef(1)
 
   useEffect(()=>{
@@ -38,21 +41,21 @@ const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
   const loadMore = async ()=>{
     if (!selectedSalon?.id) return
 
-  setLoadingPost(true)
+    setLoadingPost(true)
 
-  try {
-    const { data, pagination } = await postApi.getSalonPost(selectedSalon.id, page.current)
+    try {
+      const { data, pagination } = await postApi.getSalonPost(selectedSalon.id, page.current)
 
-    if (data.length > 0) {
-      setPosts(prev => [...prev, ...data])
-      setHasMorePost(pagination.hasMore)
-      page.current += 1
-    } else {
-      setHasMorePost(false)
+      if (data.length > 0) {
+        setPosts(prev => [...prev, ...data])
+        setHasMorePost(pagination.hasMore)
+        page.current += 1
+      } else {
+        setHasMorePost(false)
+      }
+    } finally {
+      setLoadingPost(false)
     }
-  } finally {
-    setLoadingPost(false)
-  }
   }
 
   const init = async ()=>{
@@ -67,7 +70,9 @@ const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
   
   return (
     <Column {...rest} style={{gap:'1rem', backgroundColor:'#f0f2f5', padding: 16}}>
-      <CreatePost/>
+      {
+        canCreatePost &&  <CreatePost/>
+      }
       <Column style={{height:"80vh"}}>
         <InfiniteScroll
           items={posts}
