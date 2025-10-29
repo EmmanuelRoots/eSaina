@@ -26,7 +26,7 @@ export interface ConversationDTO {
 export interface ConversationMember {
   id : string
   conversationId: string
-  userId :string
+  user : Partial<UserDTO>
   role : MemberRole
   joinedAt : string
 }
