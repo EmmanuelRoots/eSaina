@@ -5,10 +5,7 @@ import Column from "../column";
 
 export const Conversations = ()=> {
   const {loadPage,conversations, hasMore, loading} = UseConversation()
-  console.log({loading});
   
-  
-
   return (
     <Column style={{height:'80vh'}}>
       <InfiniteScroll

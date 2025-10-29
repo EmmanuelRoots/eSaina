@@ -10,11 +10,6 @@ import postApi from "../../services/api/post.api"
 import { UseSSE } from "../../context/sse"
 import { CanDoAction } from "../../services/utils/role.utils"
 
-
-// type PostComponentProps = HTMLAttributes<HTMLDivElement> & {
-//   postsList? : PostDTO[]
-// }
-
 const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
   const [loadingPost, setLoadingPost] = useState<boolean>(false)
   const {selectedSalon} = UsePost()
@@ -30,7 +25,6 @@ const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
   },[selectedSalon])
   
   useEffect(()=>{
-    console.log(newPost)
     if(newPost){
       page.current = 1
       setPosts([])
