@@ -25,11 +25,12 @@ export function InfiniteScroll<T>({
 
   useEffect(() => {
     const el = scrollContainerRef.current;
-    
     if (!el) return;
 
     const onScroll = () => {
-      const isNearTop = el.scrollTop < -40;
+      const isNearTop = Math.abs(el.scrollTop) > 200
+      console.log({isNearTop});
+      
       setUserScrolledUp(isNearTop);
     };
 
@@ -38,10 +39,17 @@ export function InfiniteScroll<T>({
   }, []);
   
   useEffect(() => {
+    console.log({hasMore,loading,sentinel});
     
-    if (!sentinel.current || loading || !hasMore) return;
+    if (!sentinel.current || loading || !hasMore) {
+      console.log('no more');
+      
+      return
+    }
     const obs = new IntersectionObserver(
       ([entry]) => {
+        console.log({entry});
+        
         if (entry.isIntersecting) loadMore()
       },
       { root: scrollContainerRef.current!, rootMargin: '100px' }
@@ -62,15 +70,15 @@ export function InfiniteScroll<T>({
         flexDirection: direction === 'top' ? 'column-reverse' : 'column',
       }}
     >
+      {items.map(renderItem)}
+
       {direction === 'top' && userScrolledUp && hasMore && (
         <>
           {loading && <p>Chargement en haut…</p>}
           {!hasMore && items.length > 0 && <p>Plus rien à charger.</p>}
-          <div ref={sentinel} style={{ height: 1 }} />
+          <div ref={sentinel} style={{ height: 100 }} ></div>
         </>
       )}
-
-      {items.map(renderItem)}
 
       {direction === 'bottom' && hasMore && (
         <>

@@ -49,8 +49,6 @@ const ConversationProvider = (props: { children: JSX.Element }) => {
   
   const loadPage = useCallback(
     async ()  => {
-      console.log('--- call this ---');
-      
       if (loading) return { items: [], hasMore };
 
       setLoading(true);
