@@ -8,4 +8,8 @@ export default defineConfig({
     include: ['jwt-decode'],
     force: true
   },
+  server : {
+    port: 5173,
+    host: '0.0.0.0',
+  }
 })
