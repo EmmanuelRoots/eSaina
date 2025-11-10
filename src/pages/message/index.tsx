@@ -41,7 +41,6 @@ const MessagePage = () => {
           <Conversations />
         </LeftSection>
         <CenterSection style={styles.centerStyle}>
-          <Text variant="Headline">Messages</Text>
           <ConversationDetail />
         </CenterSection>
         <RightSection style={styles.rightStyle}>

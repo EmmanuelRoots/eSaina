@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from "react"
 import { InfiniteScroll } from "../../infinite-scroll"
 import { MessageItem } from "../../message"
 import { UseSSE } from "../../../context/sse"
+import Text from "../../text"
 
 export const ConversationDetail = () => {
   const { selectedConversation } = UseConversation()
@@ -28,6 +29,18 @@ export const ConversationDetail = () => {
   ]
 
   const initialValues: Partial<MessageDTO> = { content: '' }
+
+  const getUserMembersName = (conv: Partial<ConversationDTO> | null) : string =>{
+    if(!conv) return ''
+    switch (conv.type) {
+      case ConversationType.AI_CHAT:
+        return 'IA'
+    
+      default:
+
+        return selectedConversation?.members?.filter(m=>m.user?.id !== user?.id).map(c=>c.user?.lastName).join(',') ?? ''
+    }
+  }
 
   const handleSubmit = (content: string | undefined) => {
     if (!content || !selectedConversation || !user) return
@@ -95,6 +108,9 @@ export const ConversationDetail = () => {
 
   return (
     <Column>
+      <Row>
+        <Text variant="Headline">Messages avec {getUserMembersName(selectedConversation)}</Text>
+      </Row>
       <Column style={{ height: "80vh", gap: 8 }}>
         <InfiniteScroll
           items={messages}
@@ -105,7 +121,7 @@ export const ConversationDetail = () => {
           direction="top"
         />
       </Column>
-      <Row style={{ justifyContent: "flex-end" }}>
+      <Row style={{ justifyContent: "flex-end", marginTop:16 }}>
         {loading && <p>loading...</p>}
         <GenericForm
           fields={fields}
