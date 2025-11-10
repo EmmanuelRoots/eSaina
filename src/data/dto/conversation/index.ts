@@ -29,4 +29,5 @@ export interface ConversationMember {
   user : Partial<UserDTO>
   role : MemberRole
   joinedAt : string
+  userId :string
 }
