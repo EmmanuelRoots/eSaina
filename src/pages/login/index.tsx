@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode"
 
 import GenericForm from "../../components/form"
 import { UseAuth } from "../../context/user"
-import type { LoginDTO } from "../../data/dto/login"
+import type { GoogleLoginDTO, LoginDTO } from "../../data/dto/login"
 import { LoginFormFactory } from "../../services/factory/loginForm.factory"
 import { useThemeColors } from "../../hooks/theme"
 import { logoFactory } from "../../services/factory/logo.factory"
@@ -14,7 +14,7 @@ const LoginPage = ()=> {
     const {login} = UseAuth()
     const colors = useThemeColors()
     const fields = LoginFormFactory()
-    const logo = logoFactory(80,80)
+    const logo = logoFactory(200,200)
     const titleStyle = {
         color : colors.primaryBackground
     } as CSSProperties
@@ -33,9 +33,9 @@ const LoginPage = ()=> {
     }
 
     const onSuccess = (res : CredentialResponse)=>{
-        const googleUser = jwtDecode(res.credential || '') as LoginDTO
-        console.log(googleUser as LoginDTO)
-        login({email:googleUser.email,password:'test'})
+        const googleUser = jwtDecode(res.credential || '') as GoogleLoginDTO
+        // console.log({res})
+        login(googleUser)
        
     }
 

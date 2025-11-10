@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import type { FieldOption, FieldType, FormErrors, FormValidator, ValidationRule } from "../../../types/components/form";
 import type { CredentialResponse } from "@react-oauth/google";
 
-export interface FieldConfig<T> {
+export interface FieldConfig<T,X=any> {
   name: keyof T;
   label: string;
   type: FieldType;
@@ -19,7 +19,12 @@ export interface FieldConfig<T> {
   min?: number;
   max?: number;
   step?: number;
-  rows?: number; // Pour textarea
+  rows?: number;
+  data? : X[]
+  getSuggestionLabel?: (item: X) => string; 
+  getSuggestionKey?: (item: X) => string; 
+  onAutoCompleteSelect?: (item: X) => void; 
+  onInputChange? : (value:string)=> void;
 }
 
 export interface FormState<T> {

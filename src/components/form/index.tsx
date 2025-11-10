@@ -43,6 +43,7 @@ const GenericForm = <T extends Record<string, any>>({
     if (validate(fields)) {
       try {
         await onSubmit(values);
+        reset()
       } catch (error) {
         console.error('Erreur lors de la soumission:', error);
       }
@@ -70,8 +71,10 @@ const GenericForm = <T extends Record<string, any>>({
               error={errors[field.name]}
               touched={touched[field.name]}
               onChange={(value) => setValue(field.name, value)}
+              onSelect={(value)=> setValue(field.name, value)}
               onBlur={() => setTouchedField(field.name)}
               labelStyle={field.labelStyle}
+              
             />
           ))}
           <button

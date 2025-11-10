@@ -1,8 +1,12 @@
+import type { RoleDTO } from "../role"
+
 export interface UserDTO {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  created_at: string;
-  updated_at: string;
+  id: string
+  firstName: string
+  lastName : string
+  email: string
+  created_at: string
+  updated_at: string
+  pdpUrl?:  string
+  role? : RoleDTO
 }

@@ -4,7 +4,7 @@ import './index.css'
 
 const CircularMenu = ()=> {
   const colors = useThemeColors()
-  console.log(colors);
+  // console.log(colors);
   
 
   return (

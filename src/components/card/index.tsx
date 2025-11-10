@@ -14,36 +14,35 @@ export const Card: FC<CardProps> = ({ children, style}) => {
 };
 
 /* ---------- CardHeader ---------- */
-type CardSubProps = { children: ReactNode; className?: string };
-export const CardHeader: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-header ${className}`} style={styles.header}>
+type CardSubProps = { children: ReactNode; style? : CSSProperties };
+export const CardHeader: FC<CardSubProps> = ({ children, style}) => (
+  <div className={`card-header`} style={{...styles.header, ...style}}>
     {children}
   </div>
 );
 
 /* ---------- CardBody ---------- */
-export const CardBody: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-body ${className}`} style={styles.body}>
+export const CardBody: FC<CardSubProps> = ({ children, style }) => (
+  <div className={`card-body`} style={{...styles.body, ...style}}>
     {children}
   </div>
 );
 
 /* ---------- CardFooter ---------- */
-export const CardFooter: FC<CardSubProps> = ({ children, className = '' }) => (
-  <div className={`card-footer ${className}`} style={styles.footer}>
+export const CardFooter: FC<CardSubProps> = ({ children, style}) => (
+  <div className={`card-footer`} style={{...styles.footer, ...style}}>
     {children}
   </div>
 );
 
 /* ---------- Styles inline (facultatif) ---------- */
-const styles: Record<string, React.CSSProperties> = {
+const styles = {
   card: {
     display: 'flex',
     flexDirection: 'column',
     border: '1px solid #e5e5e5',
     borderRadius: 8,
     boxShadow: '0 2px 6px rgba(0,0,0,.08)',
-    overflow: 'hidden',
   },
   header: {
     padding: '12px 16px',
@@ -59,4 +58,4 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: '1px solid #f0f0f0',
     backgroundColor: '#fafafa',
   },
-};
+} satisfies Record<string, React.CSSProperties>
