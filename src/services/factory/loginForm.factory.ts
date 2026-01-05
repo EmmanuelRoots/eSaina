@@ -5,7 +5,7 @@ import type { FieldConfig } from "../../interfaces/components/form"
 export const LoginFormFactory = () => {
     const colors = useThemeColors()
 
-    const formFields:FieldConfig<LoginDTO>[] = [
+    const formFields: FieldConfig<LoginDTO>[] = [
         {
             name: 'email',
             label: 'Email',
@@ -13,7 +13,7 @@ export const LoginFormFactory = () => {
             placeholder: 'tapez votre email',
             required: true,
             labelStyle: {
-                color : colors.primaryBackground
+                color: colors.default
             }
         },
         {
@@ -23,7 +23,7 @@ export const LoginFormFactory = () => {
             placeholder: 'tapez votre mot de passe',
             required: true,
             labelStyle: {
-                color : colors.primaryBackground
+                color: colors.default
             }
         }
     ]

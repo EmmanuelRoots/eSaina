@@ -7,28 +7,28 @@ import { UseAuth } from "../../context/user"
 import { useThemeColors } from "../../hooks/theme"
 
 type Props = {
-  style? : CSSProperties
-  navItems : NavItemProps []
+  style?: CSSProperties
+  navItems: NavItemProps[]
 }
 
 const defaultStyle = {
-  display : "flex",
-  flexDirection : "row",
-  alignItems : "center",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
   justifyContent: "space-between",
-  flex : 1,
-  
+  flex: 1,
+
 } as CSSProperties
 
-export const NavBar = (props:Props) => {
-  const {logout,user} = UseAuth()
+export const NavBar = (props: Props) => {
+  const { logout, user } = UseAuth()
   const colors = useThemeColors()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownStyle  = {
-    transition : 'background-color 0.3s ease',
-    '--hover-bg-color':colors.primary,
-    '--hover-text-color' : colors.primaryBackground,
+  const dropdownStyle = {
+    transition: 'background-color 0.3s ease',
+    '--hover-bg-color': colors.primary,
+    '--hover-text-color': colors.primaryBackground,
   } as CSSProperties
 
   useEffect(() => {
@@ -36,34 +36,34 @@ export const NavBar = (props:Props) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
-  };
+    };
 
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
-    <nav style={{...defaultStyle, ...props.style}}>
+    <nav style={{ ...defaultStyle, ...props.style }}>
       <div className="leftMenu">
-      {
-        props.navItems.map((nav:NavItemProps,index) => {
-          return (
-            <NavItem key={index} {...nav}/>
-          )
-        })
-      }
+        {
+          props.navItems.map((nav: NavItemProps, index) => {
+            return (
+              <NavItem key={index} {...nav} />
+            )
+          })
+        }
       </div>
       <div className="rightMenu">
         <div className="user-menu" ref={dropdownRef} >
           <img src={user?.pdpUrl} className="pdp" />
-          <span>{user?.firstName} {user?.lastName}</span>
-          <button onClick={toggleDropdown} className="dropdown-toggle">
+          <span style={{ color: colors.default }}>{user?.firstName} {user?.lastName}</span>
+          <button style={{ color: colors.default }} onClick={toggleDropdown} className="dropdown-toggle">
             ▼
           </button>
 
