@@ -10,29 +10,29 @@ import postApi from "../../services/api/post.api"
 import { UseSSE } from "../../context/sse"
 import { CanDoAction } from "../../services/utils/role.utils"
 
-const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
+const PostComponent = ({ ...rest }: HTMLAttributes<HTMLDivElement>) => {
   const [loadingPost, setLoadingPost] = useState<boolean>(false)
-  const {selectedSalon} = UsePost()
-  const [posts,setPosts] = useState<PostDTO[]>([])
+  const { selectedSalon } = UsePost()
+  const [posts, setPosts] = useState<PostDTO[]>([])
   const [hasMorePost, setHasMorePost] = useState<boolean>(false)
-  const {newPost} = UseSSE()
-  const canCreatePost = CanDoAction("Post","create")
-  
+  const { newPost } = UseSSE()
+  const canCreatePost = CanDoAction("Post", "create")
+
   const page = useRef(1)
 
-  useEffect(()=>{
+  useEffect(() => {
     init()
-  },[selectedSalon])
-  
-  useEffect(()=>{
-    if(newPost){
+  }, [selectedSalon])
+
+  useEffect(() => {
+    if (newPost) {
       page.current = 1
       setPosts([])
       loadMore()
     }
   }, [newPost])
 
-  const loadMore = async ()=>{
+  const loadMore = async () => {
     if (!selectedSalon?.id) return
 
     setLoadingPost(true)
@@ -52,32 +52,32 @@ const PostComponent = ({ ...rest}:HTMLAttributes<HTMLDivElement>)=>{
     }
   }
 
-  const init = async ()=>{
-    if(!selectedSalon?.id){
-      return {items:[], hasMores:false}
+  const init = async () => {
+    if (!selectedSalon?.id) {
+      return { items: [], hasMores: false }
     }
-    const {data, pagination} = await postApi.getSalonPost(selectedSalon?.id,page.current)
+    const { data, pagination } = await postApi.getSalonPost(selectedSalon?.id, page.current)
     setPosts(data)
     setHasMorePost(pagination.hasMore)
     page.current = 2
   }
-  
+
   return (
-    <Column {...rest} style={{gap:'1rem', backgroundColor:'#f0f2f5', padding: 16}}>
+    <Column {...rest} style={{ gap: '1rem' }}>
       {
-        canCreatePost &&  <CreatePost/>
+        canCreatePost && <CreatePost />
       }
-      <Column style={{height:"80vh"}}>
+      <Column style={{ height: "80vh" }}>
         <InfiniteScroll
           items={posts}
           loading={loadingPost}
           hasMore={hasMorePost}
           loadMore={loadMore}
-          renderItem={(p)=>(<PostItem key={p.id} post={p}/>)}
+          renderItem={(p) => (<PostItem key={p.id} post={p} />)}
         />
       </Column>
     </Column>
-  ) 
+  )
 }
 
 export default PostComponent

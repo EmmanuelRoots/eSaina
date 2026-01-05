@@ -3,14 +3,14 @@ import { Colors } from "../../constants/colors"
 
 type ThemeMode = 'light' | 'dark'
 
-export const useThemeColors = ()=>{
-  const getPreferredTheme = () => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'light'
-  };
+const getPreferredTheme = () => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+  return 'light'
+};
 
+export const useTheme = () => {
   const [theme, setTheme] = useState<ThemeMode>(getPreferredTheme)
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export const useThemeColors = ()=>{
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    const handleChange = (e:MediaQueryListEvent) => {
+    const handleChange = (e: MediaQueryListEvent) => {
       setTheme(e.matches ? 'dark' : 'light');
     };
 
@@ -27,7 +27,12 @@ export const useThemeColors = ()=>{
 
     // Nettoyage
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme])
+  }, [])
 
-  return Colors[theme]
+  return { theme, colors: Colors[theme] }
+}
+
+export const useThemeColors = () => {
+  const { colors } = useTheme()
+  return colors
 }
