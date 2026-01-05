@@ -9,35 +9,55 @@ type Props = NavItemProps & {
   style?: CSSProperties
 }
 
-
 export const NavItem = ({ name, path, type, logo, style }: Props) => {
   const colors = useThemeColors()
+
+  const activeStyle = {
+    color: colors.primary,
+    fontWeight: 600,
+  } as CSSProperties
+
   const defaultStyle = {
-    fontWeight: 500,
-    color: colors.default,
-    textDecoration: 'inherit',
-    padding: '1%',
-    // '--hover-scale': 2,
-    transition: 'background-color 0.3s ease',
-    '--hover-bg-color': colors.primary,
-    '--hover-text-color': colors.primaryBackground,
-    alignContent: "center"
+    color: colors.secondaryText,
+    '--hover-color': colors.primary,
+    '--text-color': colors.secondaryText,
   } as CSSProperties
 
   switch (type) {
     case "icon":
       return (
-        <NavLink style={{ ...style, marginInline: 20 }} key={new Date().getTime()} to={path}>
-          <div>
-            <img width={logo?.logoWidth} height={logo?.logoHeight} src={logo?.logoUrl} />
+        <NavLink
+          className="nav-item-icon"
+          style={{ ...style }}
+          key={new Date().getTime()}
+          to={path}
+        >
+          <div className="icon-container">
+            <img
+              width={logo?.logoWidth}
+              height={logo?.logoHeight}
+              src={logo?.logoUrl}
+              alt={name}
+            />
           </div>
         </NavLink>
       )
 
     default:
       return (
-        <NavLink className="nav-item-hover" style={{ ...defaultStyle, ...style }} key={new Date().getTime()} to={path}><p style={{ fontSize: '1em' }}>{name}</p></NavLink>
+        <NavLink
+          className={({ isActive }) => `nav-item-link ${isActive ? 'active' : ''}`}
+          style={({ isActive }) => ({
+            ...defaultStyle,
+            ...style,
+            ...(isActive ? activeStyle : {})
+          })}
+          key={new Date().getTime()}
+          to={path}
+        >
+          <span className="nav-text">{name}</span>
+          <div className="nav-indicator" style={{ backgroundColor: colors.primary }}></div>
+        </NavLink>
       )
   }
-
 }
