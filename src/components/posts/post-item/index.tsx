@@ -82,7 +82,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
           marginBottom: '16px'
         }}
       >
-        <CardHeader style={{ padding: '16px 20px' }}>
+        <CardHeader style={{ padding: '16px 20px', borderBottom: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.1)' : 'rgba(0, 0, 0, 0.05)'}` }}>
           <Row style={{ alignItems: 'center', gap: 12 }}>
             <div style={{ position: 'relative' }}>
               <img
@@ -140,8 +140,8 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
         {(reactions.length > 0 || post.comments.length > 0) && (
           <div style={{
             padding: '12px 20px',
-            borderTop: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.15)' : 'rgba(86, 168, 221, 0.1)'}`,
-            borderBottom: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.15)' : 'rgba(86, 168, 221, 0.1)'}`,
+            borderTop: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
+            borderBottom: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -187,7 +187,8 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
         <CardFooter style={{
           borderRadius: '0 0 16px 16px',
           padding: '8px 12px',
-          background: 'transparent'
+          background: 'transparent',
+          borderTop: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`
         }}>
           <Row style={{ gap: '8px' }}>
             <button
