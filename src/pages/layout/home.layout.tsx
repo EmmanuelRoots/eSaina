@@ -10,21 +10,21 @@ import { useThemeColors } from "../../hooks/theme";
 import { UseSSE } from "../../context/sse";
 
 const HomeLayout = () => {
-    const navItems = navBarFactory()
-    const colors = useThemeColors()
-    const {isConnected} = UseSSE()
+  const navItems = navBarFactory()
+  const colors = useThemeColors()
+  const { isConnected } = UseSSE()
 
-    console.log({isConnected});
-    
+  console.log({ isConnected });
 
-    return (
-      <Column>
-        <Row className="navSticky" style={{position : "sticky",top : 0, backgroundColor : colors.primaryBackground}}>
-          <NavBar navItems={navItems}/>
-        </Row>
-        <Outlet/>
-      </Column>
+
+  return (
+    <Column style={{ backgroundColor: colors.primaryBackground }}>
+      <Row className="navSticky" style={{ position: "sticky", top: 0, backgroundColor: colors.primaryBackground }}>
+        <NavBar navItems={navItems} />
+      </Row>
+      <Outlet />
+    </Column>
   );
-}   
+}
 
 export default HomeLayout
