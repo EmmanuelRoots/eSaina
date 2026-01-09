@@ -4,16 +4,17 @@ import { Conversations } from "../../components/conversation"
 import { CenterSection, LeftSection, RightSection, SectionLayout } from "../layout/section"
 import { ConversationDetail } from "../../components/conversation/conversationDetail"
 import { PlusCircle } from 'lucide-react'
-import { useThemeColors } from "../../hooks/theme"
 import Button from "../../components/Button"
 import Text from "../../components/text"
 import CreateConversationModal from "../../components/conversation/createConversation"
 import { UseConversation } from "../../context/conversation"
+import { useTheme } from "../../hooks/theme"
 
 const MessagePage = () => {
-  const colors = useThemeColors()
-  const {pushConversation} = UseConversation()
-  
+  const { theme, colors } = useTheme()
+  const { pushConversation } = UseConversation()
+  const isDark = theme === 'dark'
+
   const buttonStyle: CSSProperties = {
     backgroundColor: colors.secondary,
     fontSize: '1rem',
@@ -22,23 +23,46 @@ const MessagePage = () => {
 
   const [open, setOpen] = useState<boolean>(false)
 
-  const handleFinished = ()=> {
+  const handleFinished = () => {
     pushConversation()
   }
-  
-  
+
+
   return (
-    <>
-      <SectionLayout>
+    <div style={{
+      minHeight: '100vh',
+      background: isDark
+        ? '#1a1f2e'
+        : '#f5f7fa',
+      paddingBottom: '48px'
+    }}>
+      <SectionLayout style={{
+        maxWidth: '1600px',
+        gap: '28px',
+        position: 'relative'
+      }}>
         <LeftSection style={styles.leftStyle}>
-          <Button 
-            icon={<PlusCircle color={colors.primaryBackground} size={30} />} 
-            style={buttonStyle} 
-            onClick={() => setOpen(true)}
-          >
-            <Text color="primaryBackground">Créer conversation</Text>
-          </Button>
-          <Conversations />
+          <div style={{
+            background: isDark
+              ? '#242b3d'
+              : '#ffffff',
+            borderRadius: '20px',
+            border: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.2)' : 'rgba(0, 0, 0, 0.06)'}`,
+            boxShadow: isDark
+              ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+              : '0 2px 12px rgba(0, 0, 0, 0.08)',
+            padding: '12px',
+            transition: 'all 0.3s ease'
+          }}>
+            <Button
+              icon={<PlusCircle color={colors.primaryBackground} size={30} />}
+              style={buttonStyle}
+              onClick={() => setOpen(true)}
+            >
+              <Text color="primaryBackground">Créer conversation</Text>
+            </Button>
+            <Conversations />
+          </div>
         </LeftSection>
         <CenterSection style={styles.centerStyle}>
           <Text variant="Headline">Messages</Text>
@@ -48,8 +72,8 @@ const MessagePage = () => {
           <Text variant="Headline">Information</Text>
         </RightSection>
       </SectionLayout>
-      {open && <CreateConversationModal open={open} oncClose={()=>setOpen(false)} onFinished={handleFinished}/>}
-    </>
+      {open && <CreateConversationModal open={open} oncClose={() => setOpen(false)} onFinished={handleFinished} />}
+    </div>
   )
 }
 
@@ -61,10 +85,6 @@ const styles = {
   leftStyle: {
     flex: "1 1 20%",
     height: "100vh",
-    borderRightColor: "#f0f0f0",
-    borderRightWidth: "1px",
-    borderRightStyle: "solid",
-    boxShadow: '0 2px 6px rgba(0,0,0,.08)',
     paddingInline: '1%',
     gap: 8,
     paddingTop: 8
