@@ -73,10 +73,12 @@ const MessagePage = () => {
             </Column>
           </div>
         </LeftSection>
+        {/**Center section */}
         <CenterSection style={styles.centerStyle}>
           <Text variant="Headline">Messages</Text>
           <ConversationDetail />
         </CenterSection>
+        {/**reight section */}
         <RightSection style={styles.rightStyle}>
           <Text variant="Headline">Information</Text>
         </RightSection>
