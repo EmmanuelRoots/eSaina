@@ -1,19 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type JSX,
-} from "react";
-import type { PostDTO, SalonDTO } from "../../data/dto/post";
-import salonApi from "../../services/api/salon.api";
-
+import { createContext, useContext, useEffect, useState, type JSX } from 'react'
+import type { PostDTO, SalonDTO } from '../../data/dto/post'
+import salonApi from '../../services/api/salon.api'
 
 interface PostActionProps {
   getSalonByUser: () => Promise<void>
   selectSalon: (salon: SalonDTO) => void
-  selectedSalon?: SalonDTO;
+  selectedSalon?: SalonDTO
   salons?: SalonDTO[]
   posts?: PostDTO[]
   loading: boolean
@@ -22,11 +15,15 @@ interface PostActionProps {
   // resetPage : ()=>void
 }
 
-const defaultValue:PostActionProps = {
-  getSalonByUser : async ()=>{/** */},
-  selectSalon: ()=>{/** */},
-  selectedSalon : undefined,
-  loading : false,
+const defaultValue: PostActionProps = {
+  getSalonByUser: async () => {
+    /** */
+  },
+  selectSalon: () => {
+    /** */
+  },
+  selectedSalon: undefined,
+  loading: false,
   // refreshPost : ()=>{/** */},
   // hasMore:false,
   // resetPage: ()=>{/** */}
@@ -41,26 +38,26 @@ const PostProvider = (props: { children: JSX.Element }) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    getSalonByUser().then(res=>{
-      console.log({res});
-      if (res.data?.length >0){
+    getSalonByUser().then(res => {
+      console.log({ res })
+      if (res.data?.length > 0) {
         setSelectedSalon(res.data[0])
-      } else{
+      } else {
         setPosts([])
       }
     })
   }, [])
-  
+
   useEffect(() => {
-    console.log('select salon', selectedSalon);
-    
+    console.log('select salon', selectedSalon)
+
     if (selectedSalon?.id) {
       // getPostListBySalon();
     } else {
       setPosts([])
     }
   }, [selectedSalon])
-  
+
   const getSalonByUser = async () => {
     setLoading(true)
     try {
@@ -71,9 +68,9 @@ const PostProvider = (props: { children: JSX.Element }) => {
     } finally {
       setLoading(false)
     }
-  };
+  }
 
-  const selectSalon = (salon: SalonDTO) => setSelectedSalon(salon);
+  const selectSalon = (salon: SalonDTO) => setSelectedSalon(salon)
 
   const value: PostActionProps = {
     selectedSalon,
@@ -85,15 +82,13 @@ const PostProvider = (props: { children: JSX.Element }) => {
   }
 
   return (
-    <PostContext.Provider value={value}>
-      {props.children}
-    </PostContext.Provider>
+    <PostContext.Provider value={value}>{props.children}</PostContext.Provider>
   )
 }
 
 export default PostProvider
 export const UsePost = () => {
-  const ctx = useContext(PostContext);
-  if (!ctx) throw new Error("usePost must be used inside PostProvider");
-  return ctx;
-};
+  const ctx = useContext(PostContext)
+  if (!ctx) throw new Error('usePost must be used inside PostProvider')
+  return ctx
+}

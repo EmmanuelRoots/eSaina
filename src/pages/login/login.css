@@ -1,182 +1,184 @@
 .login-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    background-color: #f0f2f5;
-    font-family: 'Inter', sans-serif;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f2f5;
+  font-family: 'Inter', sans-serif;
 }
 
 .login-branding {
-    flex: 1;
-    background: linear-gradient(135deg, #A7C85C 0%, #56A8DD 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    padding: 2rem;
-    display: none;
-    /* Hidden on mobile by default */
+  flex: 1;
+  background: linear-gradient(135deg, #a7c85c 0%, #56a8dd 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 2rem;
+  display: none;
+  /* Hidden on mobile by default */
 }
 
 @media (min-width: 768px) {
-    .login-branding {
-        display: flex;
-    }
+  .login-branding {
+    display: flex;
+  }
 }
 
 .branding-logo {
-    width: 150px;
-    height: auto;
-    margin-bottom: 1.5rem;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  width: 150px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
 .login-branding h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
 }
 
 .login-branding p {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    text-align: center;
-    max-width: 80%;
+  font-size: 1.2rem;
+  opacity: 0.9;
+  text-align: center;
+  max-width: 80%;
 }
 
 .login-form-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    background-color: #ffffff;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #ffffff;
 }
 
 .login-card {
-    width: 100%;
-    max-width: 450px;
-    padding: 2.5rem;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    animation: slideIn 0.5s ease-out;
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.5s ease-out;
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 0.5rem;
-    text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .login-subtitle {
-    text-align: center;
-    color: #666;
-    margin-bottom: 2rem;
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e1e4e8;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.2s;
-    background-color: #f8f9fa;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background-color: #f8f9fa;
 }
 
 .form-input:focus {
-    border-color: #56A8DD;
-    box-shadow: 0 0 0 3px rgba(86, 168, 221, 0.1);
-    background-color: #fff;
-    outline: none;
+  border-color: #56a8dd;
+  box-shadow: 0 0 0 3px rgba(86, 168, 221, 0.1);
+  background-color: #fff;
+  outline: none;
 }
 
 .submit-button {
-    width: 100%;
-    padding: 0.875rem;
-    background: linear-gradient(to right, #A7C85C, #56A8DD);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-    margin-top: 1rem;
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(to right, #a7c85c, #56a8dd);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    opacity 0.2s;
+  margin-top: 1rem;
 }
 
 .submit-button:hover {
-    opacity: 0.95;
-    transform: translateY(-1px);
+  opacity: 0.95;
+  transform: translateY(-1px);
 }
 
 .submit-button:active {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .google-login-container {
-    margin-top: 1.5rem;
-    border-top: 1px solid #eee;
-    padding-top: 1.5rem;
-    display: flex;
-    justify-content: center;
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: center;
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-    .login-container {
-        background-color: #111827;
-    }
+  .login-container {
+    background-color: #111827;
+  }
 
-    .login-form-wrapper {
-        background-color: #1f2937;
-    }
+  .login-form-wrapper {
+    background-color: #1f2937;
+  }
 
-    .login-card {
-        background: #374151;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
+  .login-card {
+    background: #374151;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
 
-    .login-title {
-        color: #f9fafb;
-    }
+  .login-title {
+    color: #f9fafb;
+  }
 
-    .login-subtitle {
-        color: #d1d5db;
-    }
+  .login-subtitle {
+    color: #d1d5db;
+  }
 
-    .form-input {
-        background-color: #4b5563;
-        border-color: #6b7280;
-        color: #f9fafb;
-    }
+  .form-input {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+  }
 
-    .form-input:focus {
-        background-color: #374151;
-        border-color: #60a5fa;
-    }
+  .form-input:focus {
+    background-color: #374151;
+    border-color: #60a5fa;
+  }
 
-    .google-login-container {
-        border-top-color: #4b5563;
-    }
+  .google-login-container {
+    border-top-color: #4b5563;
+  }
 }

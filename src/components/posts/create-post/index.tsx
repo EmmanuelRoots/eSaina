@@ -1,10 +1,10 @@
-import { useState } from "react"
-import { UseAuth } from "../../../context/user"
-import { Card, CardBody } from "../../card"
-import Row from "../../row"
-import { CreatePostModal } from "./create-post-modal"
-import { useTheme } from "../../../hooks/theme"
-import { Edit3 } from "lucide-react"
+import { useState } from 'react'
+import { UseAuth } from '../../../context/user'
+import { Card, CardBody } from '../../card'
+import Row from '../../row'
+import { CreatePostModal } from './create-post-modal'
+import { useTheme } from '../../../hooks/theme'
+import { Edit3 } from 'lucide-react'
 
 export const CreatePost = () => {
   const { user } = UseAuth()
@@ -13,23 +13,22 @@ export const CreatePost = () => {
   const [open, setOpen] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState(false)
 
-
   return (
-    <Row style={{ justifyContent: "center" }}>
-      <Card style={{
-        width: "100%",
-        maxWidth: "780px",
-        border: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.2)' : 'rgba(0, 0, 0, 0.06)'}`,
-        background: isDark
-          ? '#242b3d'
-          : '#ffffff',
-        borderRadius: '16px',
-        boxShadow: isDark
-          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-          : '0 2px 12px rgba(0, 0, 0, 0.08)',
-        transition: 'all 0.3s ease',
-        marginBottom: '16px'
-      }}>
+    <Row style={{ justifyContent: 'center' }}>
+      <Card
+        style={{
+          width: '100%',
+          maxWidth: '780px',
+          border: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.2)' : 'rgba(0, 0, 0, 0.06)'}`,
+          background: isDark ? '#242b3d' : '#ffffff',
+          borderRadius: '16px',
+          boxShadow: isDark
+            ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+            : '0 2px 12px rgba(0, 0, 0, 0.08)',
+          transition: 'all 0.3s ease',
+          marginBottom: '16px',
+        }}
+      >
         <CardBody style={{ padding: '16px 20px' }}>
           <Row gap={16} style={{ alignItems: 'center' }}>
             <img
@@ -40,7 +39,7 @@ export const CreatePost = () => {
                 borderRadius: '50%',
                 objectFit: 'cover',
                 border: `2px solid ${colors.primary}`,
-                boxShadow: `0 2px 8px ${colors.primary}30`
+                boxShadow: `0 2px 8px ${colors.primary}30`,
               }}
             />
             <button
@@ -68,7 +67,7 @@ export const CreatePost = () => {
                 boxShadow: isHovered
                   ? `0 2px 12px ${colors.secondary}20`
                   : 'none',
-                transform: isHovered ? 'translateY(-1px)' : 'translateY(0)'
+                transform: isHovered ? 'translateY(-1px)' : 'translateY(0)',
               }}
               onClick={() => setOpen(true)}
               onMouseEnter={() => setIsHovered(true)}

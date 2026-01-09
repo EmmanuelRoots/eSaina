@@ -1,7 +1,3 @@
-const sendNotification = ()=> {
+const sendNotification = () => {}
 
-}
-
-export {
-  sendNotification
-}
+export { sendNotification }

@@ -1,22 +1,22 @@
 /**
  * generic form test
  */
-import type { FieldConfig } from "../../interfaces/components/form";
+import type { FieldConfig } from '../../interfaces/components/form'
 
 /**
  * get user as example
  */
 
 export type UserFormData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  age: number;
-  country: string;
-  acceptTerms: boolean;
-  gender: 'male' | 'female' | 'other';
-  bio: string;
-};
+  firstName: string
+  lastName: string
+  email: string
+  age: number
+  country: string
+  acceptTerms: boolean
+  gender: 'male' | 'female' | 'other'
+  bio: string
+}
 export const userFormFields: FieldConfig<UserFormData>[] = [
   {
     name: 'firstName',
@@ -79,8 +79,8 @@ export const userFormFields: FieldConfig<UserFormData>[] = [
   },
   {
     name: 'acceptTerms',
-    label: 'J\'accepte les conditions d\'utilisation',
+    label: "J'accepte les conditions d'utilisation",
     type: 'checkbox',
     required: true,
   },
-];
+]

@@ -48,7 +48,9 @@
 .modal-content {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
@@ -84,7 +86,15 @@
   background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
 }
 
-.modal-content.size-sm { max-width: 400px; }
-.modal-content.size-md { max-width: 500px; }
-.modal-content.size-lg { max-width: 700px; }
-.modal-content.size-xl { max-width: 900px; }
+.modal-content.size-sm {
+  max-width: 400px;
+}
+.modal-content.size-md {
+  max-width: 500px;
+}
+.modal-content.size-lg {
+  max-width: 700px;
+}
+.modal-content.size-xl {
+  max-width: 900px;
+}

@@ -32,9 +32,11 @@
   top: 0;
   left: 50%;
   transform-origin: 50% calc(var(--spinner-size, var(--default-size)) / 2);
-  transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars)));
+  transform: translateX(-50%)
+    rotate(calc(var(--bar-index) * 360deg / var(--total-bars)));
   opacity: 0.3;
-  animation: illuminate-bar var(--animation-speed, var(--default-speed)) linear infinite;
+  animation: illuminate-bar var(--animation-speed, var(--default-speed)) linear
+    infinite;
   animation-delay: var(--bar-delay, 0s);
 }
 
@@ -42,23 +44,28 @@
 @keyframes illuminate-bar {
   0% {
     opacity: 0.3;
-    transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
+    transform: translateX(-50%)
+      rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
   }
   8.33% {
     opacity: 1;
-    transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1.2);
+    transform: translateX(-50%)
+      rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1.2);
   }
   16.66% {
     opacity: 1;
-    transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1.2);
+    transform: translateX(-50%)
+      rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1.2);
   }
   25% {
     opacity: 0.3;
-    transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
+    transform: translateX(-50%)
+      rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
   }
   100% {
     opacity: 0.3;
-    transform: translateX(-50%) rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
+    transform: translateX(-50%)
+      rotate(calc(var(--bar-index) * 360deg / var(--total-bars))) scale(1);
   }
 }
 
@@ -158,11 +165,11 @@
   .app-container {
     padding: 1rem;
   }
-  
+
   .app-content {
     gap: 2rem;
   }
-  
+
   .example-container {
     padding: 1.5rem;
   }

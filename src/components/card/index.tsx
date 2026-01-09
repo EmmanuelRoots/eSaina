@@ -1,39 +1,45 @@
-import React, { type ReactNode, type FC, type CSSProperties } from 'react';
-import { useThemeColors } from '../../hooks/theme';
+import React, { type ReactNode, type FC, type CSSProperties } from 'react'
+import { useThemeColors } from '../../hooks/theme'
 
 /* ---------- Card ---------- */
-type CardProps = { children: ReactNode, style?: CSSProperties };
+type CardProps = { children: ReactNode; style?: CSSProperties }
 export const Card: FC<CardProps> = ({ children, style }) => {
   const colors = useThemeColors()
 
   return (
-    <div style={{ ...styles.card, backgroundColor: colors.primaryBackground, ...style }}>
+    <div
+      style={{
+        ...styles.card,
+        backgroundColor: colors.primaryBackground,
+        ...style,
+      }}
+    >
       {children}
     </div>
   )
-};
+}
 
 /* ---------- CardHeader ---------- */
-type CardSubProps = { children: ReactNode; style?: CSSProperties };
+type CardSubProps = { children: ReactNode; style?: CSSProperties }
 export const CardHeader: FC<CardSubProps> = ({ children, style }) => (
   <div className={`card-header`} style={{ ...styles.header, ...style }}>
     {children}
   </div>
-);
+)
 
 /* ---------- CardBody ---------- */
 export const CardBody: FC<CardSubProps> = ({ children, style }) => (
   <div className={`card-body`} style={{ ...styles.body, ...style }}>
     {children}
   </div>
-);
+)
 
 /* ---------- CardFooter ---------- */
 export const CardFooter: FC<CardSubProps> = ({ children, style }) => (
   <div className={`card-footer`} style={{ ...styles.footer, ...style }}>
     {children}
   </div>
-);
+)
 
 /* ---------- Styles inline (facultatif) ---------- */
 const styles = {

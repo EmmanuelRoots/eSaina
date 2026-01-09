@@ -1,24 +1,22 @@
-import type { CSSProperties, HTMLAttributes } from "react"
+import type { CSSProperties, HTMLAttributes } from 'react'
 
 type Props = HTMLAttributes<HTMLDivElement> & {
-  gap ? : number
+  gap?: number
 }
 
-const rowStyle : CSSProperties = {
-  display : "flex",
-  flexDirection : "row",
+const rowStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
 }
 
-
-const Row = ({ style, gap, ...rest }: Props)=>{
-
+const Row = ({ style, gap, ...rest }: Props) => {
   return (
-    <div 
+    <div
       style={{
         ...rowStyle,
         ...style,
-        ...(gap ? { gap: gap } : undefined)
-      }} 
+        ...(gap ? { gap: gap } : undefined),
+      }}
       {...rest}
     />
   )

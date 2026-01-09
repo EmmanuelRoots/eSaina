@@ -8,14 +8,14 @@
   --ac-hover: #f3f4f6;
   --ac-highlight: #dbeafe;
   --ac-radius: 10px;
-  --ac-shadow: 0 6px 20px rgba(0, 0, 0, .08);
-  --ac-transition: .18s ease;
+  --ac-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  --ac-transition: 0.18s ease;
 }
 
 /* ==========  INPUT  ========== */
 .autocomplete-input {
   width: 100%;
-  padding: .7rem 1rem;
+  padding: 0.7rem 1rem;
   font-size: 1rem;
   line-height: 1.4;
   color: var(--ac-text);
@@ -23,12 +23,15 @@
   border: 1.5px solid var(--ac-border);
   border-radius: var(--ac-radius);
   outline: none;
-  transition: border-color var(--ac-transition), box-shadow var(--ac-transition);
+  transition:
+    border-color var(--ac-transition),
+    box-shadow var(--ac-transition);
 }
 
 .autocomplete-input:focus {
   border-color: var(--ac-border-focus);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ac-border-focus) 18%, transparent);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--ac-border-focus) 18%, transparent);
 }
 
 .autocomplete-input:disabled {
@@ -40,23 +43,29 @@
 /* ==========  LISTE (portée dans <body>)  ========== */
 .autocomplete-list {
   margin: 0;
-  padding: .4rem 0;
+  padding: 0.4rem 0;
   list-style: none;
   border: 1px solid var(--ac-border);
   box-shadow: var(--ac-shadow);
-  animation: fadeIn .16s ease-out;
+  animation: fadeIn 0.16s ease-out;
   scrollbar-width: thin;
   scrollbar-color: var(--ac-subtle) transparent;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ==========  ITEMS  ========== */
 .autocomplete-item {
-  padding: .6rem 1rem;
+  padding: 0.6rem 1rem;
   cursor: pointer;
   color: var(--ac-text);
   transition: background var(--ac-transition);
@@ -94,11 +103,13 @@
     --ac-subtle: #9ca3af;
     --ac-hover: #374151;
     --ac-highlight: #1e40af;
-    --ac-shadow: 0 6px 22px rgba(0, 0, 0, .25);
+    --ac-shadow: 0 6px 22px rgba(0, 0, 0, 0.25);
   }
 }
 
 /* ==========  MOBILE  ========== */
 @media (max-width: 640px) {
-  .autocomplete-input { font-size: 16px; }   /* évite zoom iOS */
+  .autocomplete-input {
+    font-size: 16px;
+  } /* évite zoom iOS */
 }

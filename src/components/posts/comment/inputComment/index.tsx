@@ -1,17 +1,17 @@
-import { useRef } from "react"
+import { useRef } from 'react'
 
-import { UseAuth } from "../../../../context/user"
-import Row from "../../../row"
-import { styles } from "../../styles"
+import { UseAuth } from '../../../../context/user'
+import Row from '../../../row'
+import { styles } from '../../styles'
 
 type InputCommentProps = {
-  onPublish : (comment :string)=>void
+  onPublish: (comment: string) => void
 }
 
-export const InputComment = ({onPublish}:InputCommentProps)=> {
-  const {user} = UseAuth()
-  console.log('rerender input component');
-  
+export const InputComment = ({ onPublish }: InputCommentProps) => {
+  const { user } = UseAuth()
+  console.log('rerender input component')
+
   const contentRef = useRef<HTMLInputElement>(null)
 
   const handlePublish = () => {
@@ -23,14 +23,19 @@ export const InputComment = ({onPublish}:InputCommentProps)=> {
   }
 
   return (
-    <Row gap={16} style={{padding:'16px 12px'}}>
-      <img src={user?.pdpUrl} width={40} height={40} style={{borderRadius:'50%'}}/>
+    <Row gap={16} style={{ padding: '16px 12px' }}>
+      <img
+        src={user?.pdpUrl}
+        width={40}
+        height={40}
+        style={{ borderRadius: '50%' }}
+      />
       <Row style={styles.commentInputContainer}>
         <input
-          ref={contentRef} 
-          placeholder="Écrivez un commentaire..." 
+          ref={contentRef}
+          placeholder="Écrivez un commentaire..."
           style={styles.commentInput}
-          onKeyDown={(e) => e.key === 'Enter' && handlePublish()}
+          onKeyDown={e => e.key === 'Enter' && handlePublish()}
         />
         {/* {commentText && (
           <button

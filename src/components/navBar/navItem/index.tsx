@@ -1,8 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom'
 
-import type { NavItemProps } from "../../../interfaces/components/navItem";
-import type { CSSProperties } from "react";
-import { useThemeColors } from "../../../hooks/theme";
+import type { NavItemProps } from '../../../interfaces/components/navItem'
+import type { CSSProperties } from 'react'
+import { useThemeColors } from '../../../hooks/theme'
 import './index.css'
 
 type Props = NavItemProps & {
@@ -24,7 +24,7 @@ export const NavItem = ({ name, path, type, logo, style }: Props) => {
   } as CSSProperties
 
   switch (type) {
-    case "icon":
+    case 'icon':
       return (
         <NavLink
           className="nav-item-icon"
@@ -46,17 +46,22 @@ export const NavItem = ({ name, path, type, logo, style }: Props) => {
     default:
       return (
         <NavLink
-          className={({ isActive }) => `nav-item-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `nav-item-link ${isActive ? 'active' : ''}`
+          }
           style={({ isActive }) => ({
             ...defaultStyle,
             ...style,
-            ...(isActive ? activeStyle : {})
+            ...(isActive ? activeStyle : {}),
           })}
           key={new Date().getTime()}
           to={path}
         >
           <span className="nav-text">{name}</span>
-          <div className="nav-indicator" style={{ backgroundColor: colors.primary }}></div>
+          <div
+            className="nav-indicator"
+            style={{ backgroundColor: colors.primary }}
+          ></div>
         </NavLink>
       )
   }

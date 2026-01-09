@@ -1,7 +1,7 @@
-import { useState, type HTMLAttributes } from "react"
-import type { SalonDTO } from "../../../data/dto/post"
-import { useTheme } from "../../../hooks/theme"
-import { Hash, TrendingUp } from "lucide-react"
+import { useState, type HTMLAttributes } from 'react'
+import type { SalonDTO } from '../../../data/dto/post'
+import { useTheme } from '../../../hooks/theme'
+import { Hash, TrendingUp } from 'lucide-react'
 
 type SalonItemProps = HTMLAttributes<HTMLDivElement> & {
   salon: SalonDTO
@@ -32,13 +32,27 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
             ? `0 4px 16px ${colors.primary}20, 0 0 0 1px ${colors.secondary}15`
             : `0 4px 16px ${colors.primary}15, 0 0 0 1px ${colors.secondary}10`
           : 'none',
-        ...rest.style
+        ...rest.style,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flex: 1,
+          }}
+        >
           <div
             style={{
               width: '40px',
@@ -51,8 +65,10 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
                 ? `linear-gradient(135deg, ${colors.primary}25 0%, ${colors.secondary}20 100%)`
                 : `linear-gradient(135deg, ${colors.primary}20 0%, ${colors.secondary}15 100%)`,
               transition: 'all 0.3s ease',
-              transform: isHovered ? 'rotate(5deg) scale(1.05)' : 'rotate(0deg) scale(1)',
-              boxShadow: isHovered ? `0 4px 12px ${colors.primary}30` : 'none'
+              transform: isHovered
+                ? 'rotate(5deg) scale(1.05)'
+                : 'rotate(0deg) scale(1)',
+              boxShadow: isHovered ? `0 4px 12px ${colors.primary}30` : 'none',
             }}
           >
             <Hash
@@ -61,7 +77,14 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
               style={{ transition: 'color 0.3s ease' }}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px',
+              flex: 1,
+            }}
+          >
             <span
               style={{
                 fontSize: '0.95rem',
@@ -69,7 +92,7 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
                 color: isHovered ? colors.primary : colors.default,
                 transition: 'all 0.3s ease',
                 letterSpacing: '-0.01em',
-                lineHeight: 1.3
+                lineHeight: 1.3,
               }}
             >
               {salon.title}
@@ -78,7 +101,7 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
               style={{
                 fontSize: '0.75rem',
                 color: colors.secondaryText,
-                fontWeight: 400
+                fontWeight: 400,
               }}
             >
               Salon actif
@@ -89,7 +112,7 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
           style={{
             opacity: isHovered ? 1 : 0,
             transition: 'all 0.3s ease',
-            transform: isHovered ? 'translateX(0)' : 'translateX(-8px)'
+            transform: isHovered ? 'translateX(0)' : 'translateX(-8px)',
           }}
         >
           <TrendingUp size={16} color={colors.primary} />

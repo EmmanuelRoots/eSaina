@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-
+import { useEffect, useRef, useState } from 'react'
 
 type Props<T> = {
-  items: T[];
+  items: T[]
   loadMore: () => void
-  hasMore: boolean;
-  loading: boolean;
-  renderItem: (item: T) => React.ReactNode;
-  direction?: 'top' | 'bottom';
-};
+  hasMore: boolean
+  loading: boolean
+  renderItem: (item: T) => React.ReactNode
+  direction?: 'top' | 'bottom'
+}
 
 export function InfiniteScroll<T>({
   items,
@@ -18,38 +17,36 @@ export function InfiniteScroll<T>({
   renderItem,
   direction = 'bottom',
 }: Props<T>) {
-  const sentinel = useRef<HTMLDivElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [userScrolledUp, setUserScrolledUp] = useState(false);
-
+  const sentinel = useRef<HTMLDivElement | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const [userScrolledUp, setUserScrolledUp] = useState(false)
 
   useEffect(() => {
-    const el = scrollContainerRef.current;
-    
-    if (!el) return;
+    const el = scrollContainerRef.current
+
+    if (!el) return
 
     const onScroll = () => {
-      const isNearTop = el.scrollTop < -40;
-      setUserScrolledUp(isNearTop);
-    };
+      const isNearTop = el.scrollTop < -40
+      setUserScrolledUp(isNearTop)
+    }
 
-    el.addEventListener('scroll', onScroll);
-    return () => el.removeEventListener('scroll', onScroll);
-  }, []);
-  
+    el.addEventListener('scroll', onScroll)
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
+
   useEffect(() => {
-    
-    if (!sentinel.current || loading || !hasMore) return;
+    if (!sentinel.current || loading || !hasMore) return
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) loadMore()
       },
       { root: scrollContainerRef.current!, rootMargin: '100px' }
-    );
+    )
 
-    obs.observe(sentinel.current);
-    return () => obs.disconnect();
-  }, [loading, hasMore, loadMore, userScrolledUp]);
+    obs.observe(sentinel.current)
+    return () => obs.disconnect()
+  }, [loading, hasMore, loadMore, userScrolledUp])
 
   return (
     <div
@@ -58,7 +55,7 @@ export function InfiniteScroll<T>({
         height: '100%',
         overflowY: 'auto',
         display: 'flex',
-        gap : 8,
+        gap: 8,
         flexDirection: direction === 'top' ? 'column-reverse' : 'column',
       }}
     >
@@ -80,5 +77,5 @@ export function InfiniteScroll<T>({
         </>
       )}
     </div>
-  );
+  )
 }

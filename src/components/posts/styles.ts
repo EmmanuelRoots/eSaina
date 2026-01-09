@@ -9,7 +9,7 @@ export const styles = {
     color: '#65676b',
     fontSize: '15px',
     cursor: 'pointer',
-    transition: 'background-color 0.2s'
+    transition: 'background-color 0.2s',
   },
   textarea: {
     width: '100%',
@@ -18,7 +18,7 @@ export const styles = {
     outline: 'none',
     fontSize: '18px',
     resize: 'none',
-    fontFamily: 'inherit'
+    fontFamily: 'inherit',
   },
   commentInputContainer: {
     flex: 1,
@@ -26,7 +26,7 @@ export const styles = {
     alignItems: 'center',
     backgroundColor: '#f0f2f5',
     borderRadius: '18px',
-    padding: '0 16px'
+    padding: '0 16px',
   },
   commentInput: {
     flex: 1,
@@ -34,7 +34,7 @@ export const styles = {
     backgroundColor: 'transparent',
     outline: 'none',
     fontSize: '14px',
-    padding: '8px 0'
+    padding: '8px 0',
   },
   sendCommentButton: {
     background: 'none',
@@ -44,35 +44,35 @@ export const styles = {
     fontWeight: '600',
     fontSize: '14px',
     marginLeft: '8px',
-    padding: 0
+    padding: 0,
   },
   commentBubble: {
     backgroundColor: '#f0f2f5',
     borderRadius: '18px',
-    padding: '0.8rem'
+    padding: '0.8rem',
   },
   commentAuthor: {
     margin: 0,
     fontSize: '13px',
     fontWeight: '600',
-    marginBottom: '2px'
+    marginBottom: '2px',
   },
   commentText: {
     margin: 0,
     fontSize: '14px',
-    color: '#050505'
+    color: '#050505',
   },
   commentAction: {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
   },
-  likesIcon : {
-    backgroundColor:'#1877f2', 
-    width:'20px', 
-    height:'20px', 
-    justifyContent:'center', 
-    alignItems:'center',
-    borderRadius : '50%'
-  }
+  likesIcon: {
+    backgroundColor: '#1877f2',
+    width: '20px',
+    height: '20px',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '50%',
+  },
 } satisfies { [key: string]: React.CSSProperties }

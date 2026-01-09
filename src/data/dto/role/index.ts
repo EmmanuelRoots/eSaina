@@ -6,10 +6,10 @@ export interface AuthorizationDto {
   delete: boolean
   visibleFields: string[]
   // ajoutez ici les propriétés que vous stockez dans le JSON
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 export interface RoleDTO {
-  id? : string
-  name : string
-  authorizations : AuthorizationDto[]
+  id?: string
+  name: string
+  authorizations: AuthorizationDto[]
 }

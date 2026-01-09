@@ -6,7 +6,7 @@ export const Colors = {
     secondaryBackground: '#000000',
     default: '#000000',
     secondaryText: '#65676b',
-    likedText: '#1877f2'
+    likedText: '#1877f2',
   },
   dark: {
     primary: '#A7C85C', //167, 200, 92,
@@ -15,6 +15,6 @@ export const Colors = {
     secondaryBackground: '#374151',
     default: '#f9fafb',
     secondaryText: '#d1d5db',
-    likedText: '#60a5fa'
-  }
+    likedText: '#60a5fa',
+  },
 }

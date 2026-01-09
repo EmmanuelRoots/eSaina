@@ -1,5 +1,5 @@
-import { useModalContext } from "../../../context/modal"
-import { CheckIcon, ErrorIcon, InfoIcon, WarningIcon } from "../iconModal"
+import { useModalContext } from '../../../context/modal'
+import { CheckIcon, ErrorIcon, InfoIcon, WarningIcon } from '../iconModal'
 import './index.css'
 
 type ModalHeaderProps = {
@@ -12,7 +12,7 @@ const ModalHeader = ({
   children,
   showCloseButton = true,
   icon,
-}:ModalHeaderProps)=> {
+}: ModalHeaderProps) => {
   const { onClose, variant } = useModalContext()
 
   const defaultIcons = {
@@ -23,14 +23,13 @@ const ModalHeader = ({
   }
 
   const showIcon = variant && variant !== 'default'
-  const iconToShow = icon || (variant && variant !== 'default' ? defaultIcons[variant] : null)
+  const iconToShow =
+    icon || (variant && variant !== 'default' ? defaultIcons[variant] : null)
 
   return (
     <div className="modal-header">
       {showIcon && iconToShow && (
-        <div className="modal-icon-wrapper">
-          {iconToShow}
-        </div>
+        <div className="modal-icon-wrapper">{iconToShow}</div>
       )}
       <div className="modal-header-content">
         <h2>{children}</h2>
@@ -46,7 +45,6 @@ const ModalHeader = ({
       )}
     </div>
   )
-
 }
 
 export default ModalHeader
