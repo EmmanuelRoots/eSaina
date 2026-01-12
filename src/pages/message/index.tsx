@@ -15,6 +15,7 @@ import CreateConversationModal from '../../components/conversation/createConvers
 import { UseConversation } from '../../context/conversation'
 import { useTheme } from '../../hooks/theme'
 import Column from '../../components/column'
+import Row from '../../components/row'
 
 const MessagePage = () => {
   const { theme, colors } = useTheme()
@@ -34,22 +35,17 @@ const MessagePage = () => {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: isDark ? '#1a1f2e' : '#f5f7fa',
-        paddingBottom: '48px',
-      }}
-    >
+    <>
       <SectionLayout
         style={{
-          maxWidth: '1600px',
-          gap: '28px',
-          position: 'relative',
+          background: isDark ? '#1a1f2e' : '#f5f7fa',
+          padding: '1%',
+          gap: 8,
         }}
       >
         <LeftSection style={styles.leftStyle}>
-          <div
+          <Column
+            gap={8}
             style={{
               background: isDark ? '#242b3d' : '#ffffff',
               borderRadius: '20px',
@@ -57,26 +53,39 @@ const MessagePage = () => {
               boxShadow: isDark
                 ? '0 4px 20px rgba(0, 0, 0, 0.4)'
                 : '0 2px 12px rgba(0, 0, 0, 0.08)',
-              padding: '12px',
               transition: 'all 0.3s ease',
+              padding: 10,
             }}
           >
-            <Column gap={8}>
-              <Button
-                icon={<PlusCircle color={colors.primaryBackground} size={30} />}
-                style={buttonStyle}
-                onClick={() => setOpen(true)}
-              >
-                <Text color="primaryBackground">Créer conversation</Text>
-              </Button>
-              <Conversations />
-            </Column>
-          </div>
+            <Button
+              icon={<PlusCircle color={colors.primaryBackground} size={30} />}
+              style={buttonStyle}
+              onClick={() => setOpen(true)}
+            >
+              <Text color="primaryBackground">Créer conversation</Text>
+            </Button>
+            <Conversations />
+          </Column>
         </LeftSection>
         {/**Center section */}
-        <CenterSection style={styles.centerStyle}>
-          <Text variant="Headline">Messages</Text>
-          <ConversationDetail />
+        <CenterSection
+          style={{
+            ...styles.centerStyle,
+            background: isDark ? '#242b3d' : '#ffffff',
+            borderRadius: '20px',
+            border: `1px solid ${isDark ? 'rgba(86, 168, 221, 0.2)' : 'rgba(0, 0, 0, 0.06)'}`,
+            boxShadow: isDark
+              ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+              : '0 2px 12px rgba(0, 0, 0, 0.08)',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          <Column style={{ padding: '1%', flex: 1 }}>
+            <Row style={{ flex: 1 }}>
+              <Text variant="Headline">Messages</Text>
+            </Row>
+            <ConversationDetail />
+          </Column>
         </CenterSection>
         {/**reight section */}
         <RightSection style={styles.rightStyle}>
@@ -90,19 +99,19 @@ const MessagePage = () => {
           onFinished={handleFinished}
         />
       )}
-    </div>
+    </>
   )
 }
 
 const styles = {
   centerStyle: {
-    flex: '1 1 60%',
-    padding: 8,
+    flex: '1 1 50%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
   },
   leftStyle: {
     flex: '1 1 20%',
-    paddingInline: '1%',
-    paddingTop: 24,
   },
   rightStyle: {
     flex: '1 1 20%',

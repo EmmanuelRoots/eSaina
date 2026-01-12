@@ -7,7 +7,7 @@ export const Conversations = () => {
   const { loadPage, conversations, hasMore, loading } = UseConversation()
 
   return (
-    <Column style={{ height: '80vh' }}>
+    <Column style={{ maxHeight: '83vh', overflow: 'auto' }}>
       <InfiniteScroll
         items={conversations}
         loadMore={loadPage}

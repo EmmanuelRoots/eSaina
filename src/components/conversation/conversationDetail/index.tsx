@@ -114,8 +114,8 @@ export const ConversationDetail = () => {
   }, [selectedConversation])
 
   return (
-    <Column>
-      <Column style={{ height: '80vh', gap: 8 }}>
+    <Column gap={10}>
+      <Column style={{ height: '75vh', gap: 8 }}>
         <InfiniteScroll
           items={messages}
           hasMore={hasMore}
