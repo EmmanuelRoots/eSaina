@@ -80,6 +80,7 @@ const MessagePage = () => {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    minHeight: 0,
   }
 
   const iconButtonStyle: CSSProperties = {
@@ -100,7 +101,7 @@ const MessagePage = () => {
           background: isDark ? '#1a1f2e' : '#f5f7fa',
           padding: '1.5rem',
           gap: '1.5rem',
-          height: '100vh',
+          height: 'calc(100vh - 60px)',
           boxSizing: 'border-box',
         }}
       >

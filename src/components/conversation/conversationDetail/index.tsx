@@ -130,18 +130,18 @@ export const ConversationDetail = () => {
         />
       </div>
 
-      <div style={{ padding: '16px 24px 24px' }}>
+      <div
+        style={{
+          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+          background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.5)',
+          padding: '16px 24px',
+        }}
+      >
         <div
           style={{
-            background: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.03)',
-            borderRadius: '24px',
-            padding: '8px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
-            transition: 'all 0.2s ease',
-            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.02)',
           }}
         >
           <div
