@@ -259,7 +259,7 @@ const MessagePage = () => {
                 </Row>
 
                 {/* Messages Area */}
-                <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+                <div style={{ flex: 1, overflow: 'hidden' }}>
                   <ConversationDetail />
                 </div>
               </>
