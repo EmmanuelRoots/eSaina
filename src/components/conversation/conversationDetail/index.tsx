@@ -18,6 +18,7 @@ import { MessageItem } from '../../message'
 import { UseSSE } from '../../../context/sse'
 import { Paperclip, Send, Smile } from 'lucide-react'
 import { useTheme } from '../../../hooks/theme'
+import Text from '../../text'
 
 export const ConversationDetail = () => {
   const { selectedConversation } = UseConversation()
@@ -94,6 +95,9 @@ export const ConversationDetail = () => {
   }, [])
 
   const fetchMessages = useCallback(async (conversationId: string) => {
+    if (!conversationId) {
+      return
+    }
     setLoading(true)
     const res = await conversationApi
       .getAllMessage({ conversationId: conversationId, page: page, limit: 20 })
@@ -116,18 +120,39 @@ export const ConversationDetail = () => {
   return (
     <Column gap={10} style={{ height: '100%', position: 'relative' }}>
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <InfiniteScroll
-          items={messages}
-          hasMore={hasMore}
-          loadMore={loadMore}
-          renderItem={c => (
-            <div key={c.id} style={{ padding: '4px 24px' }}>
-              <MessageItem message={c} />
-            </div>
-          )}
-          loading={loading}
-          direction="top"
-        />
+        {messages.length === 0 && !loading ? (
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: 12,
+              color: colors.secondaryText,
+            }}
+          >
+            <Text variant="Headline" style={{ color: colors.secondaryText }}>
+              Aucun message
+            </Text>
+            <Text variant="caption" style={{ color: colors.secondaryText }}>
+              Commencez la conversation en envoyant un message
+            </Text>
+          </div>
+        ) : (
+          <InfiniteScroll
+            items={messages}
+            hasMore={hasMore}
+            loadMore={loadMore}
+            renderItem={c => (
+              <div key={c.id} style={{ padding: '4px 24px' }}>
+                <MessageItem message={c} />
+              </div>
+            )}
+            loading={loading}
+            direction="top"
+          />
+        )}
       </div>
 
       <div
