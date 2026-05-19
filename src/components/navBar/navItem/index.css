@@ -1,14 +1,58 @@
-.nav-item-hover:hover {
-  background-color: var(--hover-bg-color);
-  color: var(--hover-text-color) !important;
+.nav-item-link {
+  position: relative;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* .active {
-  background-color: var(--hover-bg-color);
-  color: var(--hover-text-color) !important;
-} */
-.nav-item-hover:hover:not(:has(img)),
-.active:not(:has(img)) {
-  background-color: var(--hover-bg-color);
-  color: var(--hover-text-color) !important;
+.nav-text {
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 80%;
+  height: 3px;
+  border-radius: 2px;
+  transition: transform 0.3s ease;
+}
+
+.nav-item-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--hover-color) !important;
+}
+
+.nav-item-link.active {
+  color: var(--hover-color);
+}
+
+.nav-item-link.active .nav-indicator {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.nav-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.nav-item-icon:hover {
+  transform: scale(1.05);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,4 +1,4 @@
-.rightMenu {
+.navbar-container {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -46,6 +46,20 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  padding: 8px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item {
@@ -79,7 +93,33 @@
 }
 
 @media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
   .leftMenu {
     display: none;
+    /* Hidden by default on mobile, can be toggled */
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background-color: inherit;
+    padding: 1rem;
+    gap: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
+
+  .leftMenu.mobile-open {
+    display: flex;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  /* .user-name {
+    display: none; 
+  } */
 }

@@ -2,35 +2,35 @@ import React, { type ReactNode, type FC, type CSSProperties } from 'react';
 import { useThemeColors } from '../../hooks/theme';
 
 /* ---------- Card ---------- */
-type CardProps = { children: ReactNode, style? : CSSProperties };
-export const Card: FC<CardProps> = ({ children, style}) => {
+type CardProps = { children: ReactNode, style?: CSSProperties };
+export const Card: FC<CardProps> = ({ children, style }) => {
   const colors = useThemeColors()
-  
+
   return (
-    <div style={{...styles.card,backgroundColor : colors.primaryBackground, ...style}}>
+    <div style={{ ...styles.card, backgroundColor: colors.primaryBackground, ...style }}>
       {children}
     </div>
   )
 };
 
 /* ---------- CardHeader ---------- */
-type CardSubProps = { children: ReactNode; style? : CSSProperties };
-export const CardHeader: FC<CardSubProps> = ({ children, style}) => (
-  <div className={`card-header`} style={{...styles.header, ...style}}>
+type CardSubProps = { children: ReactNode; style?: CSSProperties };
+export const CardHeader: FC<CardSubProps> = ({ children, style }) => (
+  <div className={`card-header`} style={{ ...styles.header, ...style }}>
     {children}
   </div>
 );
 
 /* ---------- CardBody ---------- */
 export const CardBody: FC<CardSubProps> = ({ children, style }) => (
-  <div className={`card-body`} style={{...styles.body, ...style}}>
+  <div className={`card-body`} style={{ ...styles.body, ...style }}>
     {children}
   </div>
 );
 
 /* ---------- CardFooter ---------- */
-export const CardFooter: FC<CardSubProps> = ({ children, style}) => (
-  <div className={`card-footer`} style={{...styles.footer, ...style}}>
+export const CardFooter: FC<CardSubProps> = ({ children, style }) => (
+  <div className={`card-footer`} style={{ ...styles.footer, ...style }}>
     {children}
   </div>
 );
@@ -47,7 +47,7 @@ const styles = {
   header: {
     padding: '12px 16px',
     fontWeight: 600,
-    borderBottom: '1px solid #f0f0f0',
+    // borderBottom: '1px solid #f0f0f0',
   },
   body: {
     padding: 16,
@@ -55,7 +55,7 @@ const styles = {
   },
   footer: {
     padding: '12px 16px',
-    borderTop: '1px solid #f0f0f0',
+    // borderTop: '1px solid #f0f0f0',
     backgroundColor: '#fafafa',
   },
 } satisfies Record<string, React.CSSProperties>
