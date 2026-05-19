@@ -19,9 +19,7 @@ const HomeLayout = () => {
 
     return (
       <Column>
-        <Row className="navSticky" style={{position : "sticky",top : 0, backgroundColor : colors.primaryBackground}}>
-          <NavBar navItems={navItems}/>
-        </Row>
+        <NavBar navItems={navItems}/>
         <Outlet/>
       </Column>
   );

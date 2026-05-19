@@ -1,35 +1,17 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react"
-
+import { useEffect, useRef, useState } from "react"
 import type { NavItemProps } from "../../interfaces/components/navItem"
 import { NavItem } from "./navItem"
 import './index.css'
 import { UseAuth } from "../../context/user"
-import { useThemeColors } from "../../hooks/theme"
 
 type Props = {
-  style?: CSSProperties
   navItems: NavItemProps[]
 }
 
-const defaultStyle = {
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  flex: 1,
-
-} as CSSProperties
-
 export const NavBar = (props: Props) => {
   const { logout, user } = UseAuth()
-  const colors = useThemeColors()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownStyle = {
-    transition: 'background-color 0.3s ease',
-    '--hover-bg-color': colors.primary,
-    '--hover-text-color': colors.primaryBackground,
-  } as CSSProperties
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -44,35 +26,24 @@ export const NavBar = (props: Props) => {
     };
   }, []);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
   return (
-    <nav style={{ ...defaultStyle, ...props.style }}>
+    <nav className="nav-container">
       <div className="leftMenu">
-        {
-          props.navItems.map((nav: NavItemProps, index) => {
-            return (
-              <NavItem key={index} {...nav} />
-            )
-          })
-        }
+        {props.navItems.map((nav, index) => (
+          <NavItem key={index} {...nav} />
+        ))}
       </div>
       <div className="rightMenu">
-        <div className="user-menu" ref={dropdownRef} >
+        <div className="user-menu" ref={dropdownRef} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           <img src={user?.pdpUrl} className="pdp" />
-          <span style={{ color: colors.default }}>{user?.firstName} {user?.lastName}</span>
-          <button style={{ color: colors.default }} onClick={toggleDropdown} className="dropdown-toggle">
-            ▼
-          </button>
+          <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{user?.firstName}</span>
+          <span className="dropdown-toggle">▼</span>
 
-          {/* Dropdown menu */}
           {isDropdownOpen && (
             <div className="dropdown-menu">
-              <button className="dropdown-item" style={dropdownStyle}><p>Profil</p></button>
-              <button className="dropdown-item" style={dropdownStyle}><p>Paramètres</p></button>
-              <button className="dropdown-item" style={dropdownStyle} onClick={logout}><p>Déconnexion</p></button>
+              <button className="dropdown-item"><p>Profil</p></button>
+              <button className="dropdown-item"><p>Paramètres</p></button>
+              <button className="dropdown-item" onClick={logout}><p>Déconnexion</p></button>
             </div>
           )}
         </div>

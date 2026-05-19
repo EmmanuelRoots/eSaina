@@ -1,69 +1,81 @@
 .rightMenu {
   display: flex;
-  flex-direction: row;
-  flex: 1 1 20%;
-  justify-content: end;
-  padding-right: 1%;
+  align-items: center;
+  gap: 1rem;
 }
 
 .leftMenu {
   display: flex;
-  flex-direction: row;
-  flex: 1 1 80%;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .user-menu {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.user-menu:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
 }
 
 .dropdown-toggle {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.5rem);
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  min-width: 160px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  width: 160px;
   z-index: 1000;
-  margin-top: 4px;
   display: flex;
   flex-direction: column;
 }
 
 .dropdown-item {
-  padding: 8px 16px;
+  padding: 0.6rem 1rem;
   text-align: left;
   background: none;
   border: none;
   cursor: pointer;
   width: 100%;
-  text-align: start;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .dropdown-item:hover {
-  background-color: var(--hover-bg-color);
-  color: var(--hover-text-color) !important;
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary);
 }
 
-button>p {
-  font-size: 1rem;
+.dropdown-item > p {
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 .pdp {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-background);
 }
 
 @media (max-width: 768px) {
