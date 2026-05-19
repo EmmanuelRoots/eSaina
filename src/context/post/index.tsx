@@ -14,7 +14,7 @@ interface PostActionProps {
   getSalonByUser: () => Promise<void>
   selectSalon: (salon: SalonDTO) => void
   selectedSalon?: SalonDTO;
-  salons?: SalonDTO[]
+  salons: SalonDTO[]
   posts?: PostDTO[]
   loading: boolean
   // refreshPost:()=>void
@@ -26,6 +26,7 @@ const defaultValue:PostActionProps = {
   getSalonByUser : async ()=>{/** */},
   selectSalon: ()=>{/** */},
   selectedSalon : undefined,
+  salons: [],
   loading : false,
   // refreshPost : ()=>{/** */},
   // hasMore:false,

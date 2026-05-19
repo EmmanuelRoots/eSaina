@@ -5,6 +5,11 @@ import MessagePage from "../pages/message"
 import ConversationProvider from "../context/conversation"
 import PostProvider from "../context/post"
 import SSEProvider from "../context/sse"
+import { ProjectProvider } from "../context/project"
+import ProjectList from "../pages/project/ProjectList"
+import Board from "../pages/project/Board"
+import Backlog from "../pages/project/Backlog"
+import ProjectLayout from "../pages/project/ProjectLayout"
 
 const PrivateRoute = () => {
     
@@ -12,11 +17,12 @@ const PrivateRoute = () => {
         <ConversationProvider>
             <PostProvider>
                 <SSEProvider>
-                    <Routes>
-                        <Route
-                            path="/" 
-                            element={<HomeLayout/>}
-                        >
+                    <ProjectProvider>
+                        <Routes>
+                            <Route
+                                path="/" 
+                                element={<HomeLayout/>}
+                            >
                             <Route
                                 path=""
                                 element={<NewsPage/>}
@@ -25,8 +31,16 @@ const PrivateRoute = () => {
                                 path="message"
                                 element={<MessagePage/>}
                             />
+                            <Route path="projects">
+                                <Route path="" element={<ProjectList />} />
+                                <Route path=":projectId" element={<ProjectLayout />}>
+                                    <Route path="board" element={<Board />} />
+                                    <Route path="backlog" element={<Backlog />} />
+                                </Route>
+                            </Route>
                         </Route>
                     </Routes>
+                    </ProjectProvider>
                 </SSEProvider>
             </PostProvider>
         </ConversationProvider>

@@ -1,30 +1,34 @@
-import { Outlet } from "react-router-dom";
-
-// import { UseAuth } from "../../context/user";
+import { Outlet } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Sidebar } from "../../components/sidebar"
+import { useThemeColors } from "../../hooks/theme"
+import { UseSSE } from "../../context/sse"
 import "./index.css"
-import { NavBar } from "../../components/navBar";
-import { navBarFactory } from "../../services/factory/navBar.factory";
-import Column from "../../components/column";
-import Row from "../../components/row";
-import { useThemeColors } from "../../hooks/theme";
-import { UseSSE } from "../../context/sse";
+
+const STORAGE_KEY = 'esaina.sidebar-collapsed'
 
 const HomeLayout = () => {
-  const navItems = navBarFactory()
-  const colors = useThemeColors()
+  useThemeColors()              // applies CSS variables on the root
   const { isConnected } = UseSSE()
+  console.log({ isConnected })
 
-  console.log({ isConnected });
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try { return localStorage.getItem(STORAGE_KEY) === 'true' }
+    catch { return false }
+  })
 
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, String(collapsed)) } catch { /* ignore */ }
+  }, [collapsed])
 
   return (
-    <Column style={{ backgroundColor: colors.primaryBackground }}>
-      <Row className="navSticky" style={{ position: "sticky", top: 0, backgroundColor: colors.primaryBackground }}>
-        <NavBar navItems={navItems} />
-      </Row>
-      <Outlet />
-    </Column>
-  );
+    <div style={{ display: 'flex', height: '100vh', background: 'var(--color-background)' }}>
+      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        <Outlet />
+      </main>
+    </div>
+  )
 }
 
 export default HomeLayout
