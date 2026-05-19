@@ -1,21 +1,11 @@
-import { createContext, useContext, useState, type JSX } from "react";
+import { useState, type JSX } from "react";
 import type { ProjectDTO } from "../../data/dto/project";
 import type { IssueDTO } from "../../data/dto/issue";
 import type { SprintDTO } from "../../data/dto/sprint";
 import projectApi from "../../services/api/project.api";
+import { ProjectContext } from "./context";
 
-interface ProjectContextType {
-  currentProject: ProjectDTO | null;
-  boardIssues: Record<string, IssueDTO[]>;
-  backlogIssues: IssueDTO[];
-  sprints: (SprintDTO & { issues: IssueDTO[] })[];
-  loading: boolean;
-  fetchProjectData: (projectId: string) => Promise<void>;
-  fetchBoard: (projectId: string) => Promise<void>;
-  fetchBacklog: (projectId: string) => Promise<void>;
-}
-
-const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
+export { useProject } from "./useProject";
 
 export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   const [currentProject, setCurrentProject] = useState<ProjectDTO | null>(null);
@@ -71,12 +61,4 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
       {children}
     </ProjectContext.Provider>
   );
-};
-
-export const useProject = () => {
-  const context = useContext(ProjectContext);
-  if (context === undefined) {
-    throw new Error("useProject must be used within a ProjectProvider");
-  }
-  return context;
 };
