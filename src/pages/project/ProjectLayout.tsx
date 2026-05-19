@@ -34,7 +34,25 @@ const ProjectLayout = () => {
           display: 'flex', alignItems: 'center', gap: 8,
           fontSize: 13, color: 'var(--color-text-secondary)', fontWeight: 500,
         }}>
-          <button onClick={() => navigate('/projects')}>Projets</button>
+          <button
+            onClick={() => navigate('/projects')}
+            style={{
+              color: 'var(--color-text-secondary)',
+              fontSize: 13, fontWeight: 500, padding: '4px 6px',
+              borderRadius: 6,
+              transition: 'color 120ms cubic-bezier(.4,0,.2,1), background 120ms cubic-bezier(.4,0,.2,1)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text)'
+              e.currentTarget.style.background = 'var(--color-surface2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)'
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            Projets
+          </button>
           <ChevronRight size={14} color="var(--color-text-tertiary)" />
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--color-text)', fontWeight: 700 }}>
             {currentProject?.name ?? 'Chargement…'}
