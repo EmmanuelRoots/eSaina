@@ -100,12 +100,13 @@ const SprintSection = ({
       borderRadius: 14, overflow: 'hidden',
       boxShadow: 'var(--shadow-xs)',
     }}>
-      <button
+      <div
         onClick={() => setOpen(!open)}
         style={{
           width: '100%', padding: '14px 16px',
           display: 'flex', alignItems: 'center', gap: 12,
           textAlign: 'left',
+          cursor: 'pointer',
           background: isActive ? 'linear-gradient(90deg, rgba(16,185,129,0.06), transparent 60%)' : 'transparent',
         }}
       >
@@ -165,7 +166,7 @@ const SprintSection = ({
         ) : sprint.status === SprintStatus.PLANNED ? (
           <button style={btnPrimaryStyle}><Play size={14} />Lancer</button>
         ) : null}
-      </button>
+      </div>
 
       {open && (
         <div>
@@ -207,9 +208,9 @@ const BacklogPanel = ({ issues, defaultOpen }: { issues: IssueDTO[]; defaultOpen
       borderRadius: 14, overflow: 'hidden',
       boxShadow: 'var(--shadow-xs)',
     }}>
-      <button
+      <div
         onClick={() => setOpen(!open)}
-        style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left' }}
+        style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', cursor: 'pointer' }}
       >
         {open ? <ChevronDown size={16} color="var(--color-text-tertiary)" /> : <ChevronRight size={16} color="var(--color-text-tertiary)" />}
         <Inbox size={18} color="var(--color-text-tertiary)" strokeWidth={2.4} />
@@ -220,7 +221,7 @@ const BacklogPanel = ({ issues, defaultOpen }: { issues: IssueDTO[]; defaultOpen
           </span>
         </div>
         <button style={btnSecondaryStyle}><Plus size={14} />Créer un sprint</button>
-      </button>
+      </div>
       {open && (
         <div>
           {issues.map((issue, i) => (
