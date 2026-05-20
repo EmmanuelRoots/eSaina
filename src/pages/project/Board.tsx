@@ -13,12 +13,13 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useProject } from "../../context/project/useProject"
-import { IssueStatus, IssueType, type IssueDTO } from "../../data/dto/issue"
+import { IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
 import { SprintStatus } from "../../data/dto/sprint"
 import Column from "../../components/column"
 import Row from "../../components/row"
 import { Avatar } from "../../components/avatar"
 import { IssueCard } from "../../components/issue/IssueCard"
+import { IssueForm } from "../../components/issue/IssueForm"
 
 const COLUMNS: Array<{ status: IssueStatus; label: string; accent: string }> = [
   { status: IssueStatus.TODO,        label: 'À faire',     accent: '#94a3b8' },
@@ -34,12 +35,12 @@ const Board = () => {
   const { projectId } = useParams<{ projectId: string }>()
   const {
     boardIssues, fetchBoard, fetchProjectData, currentProject, sprints, fetchBacklog,
-    createIssue, moveIssue,
+    createIssue, updateIssue, moveIssue,
   } = useProject()
   const [searchQ, setSearchQ] = useState('')
   const [activeAssignee, setActiveAssignee] = useState<string | null>(null)
-  const [creatingIn, setCreatingIn] = useState<IssueStatus | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [modalData, setModalData] = useState<{ open: boolean; status?: IssueStatus; issue?: IssueDTO }>({ open: false })
 
   useEffect(() => {
     if (projectId) {
@@ -126,23 +127,18 @@ const Board = () => {
     moveIssue(sourceInfo.issue.id, sourceInfo.status, toStatus, toIndex)
   }
 
-  const handleCreate = async (status: IssueStatus, title: string) => {
-    if (!projectId || !title.trim()) {
-      setCreatingIn(null)
-      return
+  const handleCreateOrUpdate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
+    if (modalData.issue) {
+      await updateIssue(modalData.issue.id, data as UpdateIssueRequestDTO)
+    } else {
+      await createIssue({
+        ...data as CreateIssueRequestDTO,
+        sprintId: activeSprint?.id,
+        status: modalData.status, // Use the status of the column where "Create" was clicked
+      })
     }
-    const created = await createIssue({
-      projectId,
-      title: title.trim(),
-      type: IssueType.TASK,
-      sprintId: activeSprint?.id,
-    })
-    // Backend creates issues in TODO; if user wanted another column, move it right away.
-    if (created && status !== IssueStatus.TODO) {
-      const targetIdx = (boardIssues[status]?.length ?? 0)
-      await moveIssue(created.id, IssueStatus.TODO, status, targetIdx)
-    }
-    setCreatingIn(null)
+    if (projectId) fetchBoard(projectId)
+    setModalData({ open: false })
   }
 
   return (
@@ -261,10 +257,8 @@ const Board = () => {
                 label={col.label}
                 accent={col.accent}
                 issues={issues}
-                isCreating={creatingIn === col.status}
-                onAskCreate={() => setCreatingIn(col.status)}
-                onCancelCreate={() => setCreatingIn(null)}
-                onCreate={(title) => handleCreate(col.status, title)}
+                onAskCreate={() => setModalData({ open: true, status: col.status })}
+                onEditIssue={(issue) => setModalData({ open: true, issue, status: col.status })}
               />
             )
           })}
@@ -274,6 +268,19 @@ const Board = () => {
           <div style={{ padding: 24, color: 'var(--color-text-secondary)' }}>Chargement du projet…</div>
         )}
       </Column>
+
+      {modalData.open && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'var(--color-surface)', borderRadius: 12, width: 400 }}>
+            <IssueForm 
+              projectId={projectId!} 
+              initialData={modalData.issue}
+              onSubmit={handleCreateOrUpdate} 
+              onCancel={() => setModalData({ open: false })} 
+            />
+          </div>
+        </div>
+      )}
 
       <DragOverlay>
         {activeIssue ? <IssueCard issue={activeIssue} style={{ cursor: 'grabbing' }} /> : null}
@@ -287,14 +294,12 @@ type BoardColumnProps = {
   label: string
   accent: string
   issues: IssueDTO[]
-  isCreating: boolean
   onAskCreate: () => void
-  onCancelCreate: () => void
-  onCreate: (title: string) => void
+  onEditIssue: (issue: IssueDTO) => void
 }
 
 const BoardColumn = ({
-  status, label, accent, issues, isCreating, onAskCreate, onCancelCreate, onCreate,
+  status, label, accent, issues, onAskCreate, onEditIssue,
 }: BoardColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: `col:${status}` })
 
@@ -331,11 +336,11 @@ const BoardColumn = ({
       }}>
         <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {issues.map((issue) => (
-            <SortableIssueCard key={issue.id} issue={issue} />
+            <SortableIssueCard key={issue.id} issue={issue} onEdit={() => onEditIssue(issue)} />
           ))}
         </SortableContext>
 
-        {issues.length === 0 && !isCreating && (
+        {issues.length === 0 && (
           <div style={{
             border: '1.5px dashed var(--color-border-strong)',
             borderRadius: 10, padding: '24px 12px',
@@ -343,35 +348,31 @@ const BoardColumn = ({
           }}>Déposer ici</div>
         )}
 
-        {isCreating ? (
-          <NewIssueForm onSubmit={onCreate} onCancel={onCancelCreate} />
-        ) : (
-          <button
-            onClick={onAskCreate}
-            style={{
-              marginTop: 4, padding: '10px 12px', borderRadius: 8,
-              color: 'var(--color-text-tertiary)', fontSize: 12, fontWeight: 600,
-              display: 'flex', alignItems: 'center', gap: 8,
-              transition: 'all 120ms cubic-bezier(.4,0,.2,1)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--color-surface)'
-              e.currentTarget.style.color = 'var(--color-text-secondary)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = 'var(--color-text-tertiary)'
-            }}
-          >
-            <Plus size={14} /> Créer une issue
-          </button>
-        )}
+        <button
+          onClick={onAskCreate}
+          style={{
+            marginTop: 4, padding: '10px 12px', borderRadius: 8,
+            color: 'var(--color-text-tertiary)', fontSize: 12, fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: 8,
+            transition: 'all 120ms cubic-bezier(.4,0,.2,1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--color-surface)'
+            e.currentTarget.style.color = 'var(--color-text-secondary)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent'
+            e.currentTarget.style.color = 'var(--color-text-tertiary)'
+          }}
+        >
+          <Plus size={14} /> Créer une issue
+        </button>
       </div>
     </div>
   )
 }
 
-const SortableIssueCard = ({ issue }: { issue: IssueDTO }) => {
+const SortableIssueCard = ({ issue, onEdit }: { issue: IssueDTO; onEdit: () => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: issue.id })
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -380,57 +381,8 @@ const SortableIssueCard = ({ issue }: { issue: IssueDTO }) => {
   }
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <IssueCard issue={issue} onClick={() => {}} />
+      <IssueCard issue={issue} onClick={onEdit} />
     </div>
-  )
-}
-
-const NewIssueForm = ({
-  onSubmit, onCancel,
-}: { onSubmit: (title: string) => void; onCancel: () => void }) => {
-  const [value, setValue] = useState('')
-  return (
-    <form
-      onSubmit={(e) => { e.preventDefault(); onSubmit(value) }}
-      style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 10, padding: 10,
-        display: 'flex', flexDirection: 'column', gap: 8,
-        boxShadow: 'var(--shadow-sm)',
-      }}
-    >
-      <input
-        autoFocus
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Escape') onCancel() }}
-        placeholder="Titre de l'issue…"
-        style={{
-          border: 'none', outline: 'none', background: 'transparent',
-          fontSize: 13, color: 'var(--color-text)',
-        }}
-      />
-      <Row style={{ gap: 6, justifyContent: 'flex-end' }}>
-        <button
-          type="button" onClick={onCancel}
-          style={{
-            ...btnSecondaryStyle, height: 26, padding: '0 8px', fontSize: 11,
-          }}
-        >
-          <X size={12} /> Annuler
-        </button>
-        <button
-          type="submit" disabled={!value.trim()}
-          style={{
-            ...btnPrimaryStyle, height: 26, padding: '0 10px', fontSize: 11,
-            opacity: value.trim() ? 1 : 0.5,
-          }}
-        >
-          Créer
-        </button>
-      </Row>
-    </form>
   )
 }
 
