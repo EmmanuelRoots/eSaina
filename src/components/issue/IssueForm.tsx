@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue";
+import { useState, useEffect } from "react";
+import { IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO, type IssueCommentDTO } from "../../data/dto/issue";
 import { useProject } from "../../context/project/useProject";
+import issueApi from "../../services/api/issue.api";
 import Row from "../row";
+import { Avatar } from "../avatar";
 
 interface IssueFormProps {
   initialData?: IssueDTO;
@@ -11,29 +13,51 @@ interface IssueFormProps {
   sprintId?: string | null;
 }
 
-export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId }: IssueFormProps) => {
-  const { currentProject } = useProject();
+export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId: propSprintId }: IssueFormProps) => {
+  const { currentProject, sprints } = useProject();
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [type, setType] = useState<IssueType>(initialData?.type || IssueType.TASK);
   const [status, setStatus] = useState<IssueStatus>(initialData?.status || IssueStatus.TODO);
   const [assigneeId, setAssigneeId] = useState<string | undefined>(initialData?.assigneeId || undefined);
+  const [selectedSprintId, setSelectedSprintId] = useState<string | null>(propSprintId || initialData?.sprintId || null);
+  
+  const [comments, setComments] = useState<IssueCommentDTO[]>([]);
+  const [newComment, setNewComment] = useState("");
+
+  useEffect(() => {
+    if (initialData?.id) {
+      issueApi.getComments(initialData.id).then(setComments).catch(console.error);
+    }
+  }, [initialData?.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit({
-      projectId,
+    const payload: any = {
       title,
       description,
       type,
       status,
       assigneeId,
-      sprintId: sprintId || initialData?.sprintId,
-    } as CreateIssueRequestDTO | UpdateIssueRequestDTO);
+      sprintId: selectedSprintId,
+    };
+
+    if (!initialData) {
+      payload.projectId = projectId;
+    }
+
+    await onSubmit(payload as CreateIssueRequestDTO | UpdateIssueRequestDTO);
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !initialData?.id) return;
+    const comment = await issueApi.addComment({ issueId: initialData.id, content: newComment });
+    setComments([...comments, comment]);
+    setNewComment("");
   };
 
   return (
-    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '90vh', overflowY: 'auto' }}>
       <header>
         <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text)' }}>
           {initialData ? `Modifier ${initialData.key}` : "Créer une issue"}
@@ -58,13 +82,13 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
             value={description || ""} 
             onChange={(e) => setDescription(e.target.value)} 
             placeholder="Ajouter une description..."
-            style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }}
+            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
           />
         </div>
         
         <Row style={{ gap: '16px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={labelStyle}>Type d'issue</label>
+            <label style={labelStyle}>Type</label>
             <select value={type} onChange={(e) => setType(e.target.value as IssueType)} style={selectStyle}>
               {Object.values(IssueType).map(t => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -94,6 +118,48 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
           </select>
         </div>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={labelStyle}>Sprint</label>
+          <select 
+            value={selectedSprintId || ""} 
+            onChange={(e) => setSelectedSprintId(e.target.value || null)} 
+            style={selectStyle}
+          >
+            <option value="">Backlog</option>
+            {sprints.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.name} ({s.status === 'ACTIVE' ? 'Actif' : s.status === 'PLANNED' ? 'Planifié' : 'Clos'})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {initialData && (
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px' }}>
+            <h3 style={{ fontSize: '14px', marginBottom: '12px' }}>Commentaires</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '12px' }}>
+              {comments.map(c => (
+                <div key={c.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <Avatar user={c.author} size={28} />
+                  <div style={{ background: 'var(--color-surface2)', padding: '8px', borderRadius: '8px', fontSize: '13px' }}>
+                    <strong>{c.author?.firstName} {c.author?.lastName}</strong>
+                    <div style={{ marginTop: '2px' }}>{c.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Ajouter un commentaire..."
+                style={inputStyle}
+              />
+              <button type="button" onClick={handleAddComment} style={btnSecondaryStyle}>Envoyer</button>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
           <button type="button" onClick={onCancel} style={btnSecondaryStyle}>Annuler</button>
           <button type="submit" style={btnPrimaryStyle}>
@@ -120,6 +186,7 @@ const inputStyle: React.CSSProperties = {
   fontSize: '14px',
   outline: 'none',
   transition: 'border-color 0.2s',
+  flex: 1,
 };
 
 const selectStyle: React.CSSProperties = {

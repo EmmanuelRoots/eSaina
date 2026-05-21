@@ -9,6 +9,7 @@ import {
 import type { SprintDTO } from "../../data/dto/sprint";
 import projectApi from "../../services/api/project.api";
 import issueApi from "../../services/api/issue.api";
+import sprintApi from "../../services/api/sprint.api";
 import { ProjectContext } from "./context";
 
 export { useProject } from "./useProject";
@@ -63,11 +64,60 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
       });
       if (!payload.sprintId) {
         setBacklogIssues((prev) => [issue, ...prev]);
+      } else {
+        setSprints((prev) =>
+          prev.map((s) =>
+            s.id === payload.sprintId
+              ? { ...s, issues: [...s.issues, issue] }
+              : s,
+          ),
+        );
       }
       return issue;
     } catch (error) {
       console.error("Error creating issue", error);
       return null;
+    }
+  };
+
+  const createSprint = async (projectId: string): Promise<SprintDTO | null> => {
+    try {
+      const nextNumber = sprints.length + 1;
+      const sprint = await sprintApi.createSprint({
+        projectId,
+        name: `Sprint ${nextNumber}`,
+      });
+      setSprints((prev) => [...prev, { ...sprint, issues: [] }]);
+      return sprint;
+    } catch (error) {
+      console.error("Error creating sprint", error);
+      return null;
+    }
+  };
+
+  const startSprint = async (sprintId: string): Promise<void> => {
+    try {
+      const updated = await sprintApi.startSprint(sprintId);
+      setSprints((prev) =>
+        prev.map((s) => (s.id === sprintId ? { ...s, ...updated } : s)),
+      );
+    } catch (error) {
+      console.error("Error starting sprint", error);
+    }
+  };
+
+  const closeSprint = async (sprintId: string): Promise<void> => {
+    try {
+      const updated = await sprintApi.closeSprint(sprintId);
+      setSprints((prev) =>
+        prev.map((s) => (s.id === sprintId ? { ...s, ...updated } : s)),
+      );
+      // Refresh backlog to see issues moved from the closed sprint
+      if (currentProject?.id) {
+        await fetchBacklog(currentProject.id);
+      }
+    } catch (error) {
+      console.error("Error closing sprint", error);
     }
   };
 
@@ -77,6 +127,8 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
   ): Promise<IssueDTO | null> => {
     try {
       const updated = await issueApi.updateIssue(issueId, payload);
+      
+      // Update Board state
       setBoardIssues((prev) => {
         const next: Record<string, IssueDTO[]> = {};
         for (const [status, list] of Object.entries(prev)) {
@@ -84,6 +136,18 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
         }
         return next;
       });
+
+      // Update Backlog state
+      setBacklogIssues((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+
+      // Update Sprints state
+      setSprints((prev) =>
+        prev.map((s) => ({
+          ...s,
+          issues: s.issues.map((i) => (i.id === updated.id ? updated : i)),
+        })),
+      );
+
       return updated;
     } catch (error) {
       console.error("Error updating issue", error);
@@ -135,6 +199,9 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
         fetchBoard,
         fetchBacklog,
         createIssue,
+        createSprint,
+        startSprint,
+        closeSprint,
         updateIssue,
         moveIssue,
       }}

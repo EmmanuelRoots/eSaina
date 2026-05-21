@@ -13,6 +13,9 @@ export interface ProjectContextType {
   fetchBoard: (projectId: string) => Promise<void>;
   fetchBacklog: (projectId: string) => Promise<void>;
   createIssue: (payload: CreateIssueRequestDTO) => Promise<IssueDTO | null>;
+  createSprint: (projectId: string) => Promise<SprintDTO | null>;
+  startSprint: (sprintId: string) => Promise<void>;
+  closeSprint: (sprintId: string) => Promise<void>;
   updateIssue: (issueId: string, payload: UpdateIssueRequestDTO) => Promise<IssueDTO | null>;
   moveIssue: (issueId: string, fromStatus: IssueStatus, toStatus: IssueStatus, toIndex: number) => Promise<void>;
 }

@@ -28,8 +28,9 @@ const STATUS_LABEL: Record<IssueStatus, string> = {
 
 const formatDate = (iso?: string | null) => iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : null
 
-const BacklogIssueRow = ({ issue, isLast }: { issue: IssueDTO; isLast: boolean }) => (
+const BacklogIssueRow = ({ issue, isLast, onClick }: { issue: IssueDTO; isLast: boolean; onClick?: () => void }) => (
   <div
+    onClick={onClick}
     style={{
       padding: '8px 16px',
       display: 'flex', alignItems: 'center', gap: 12,
@@ -83,8 +84,16 @@ const BacklogIssueRow = ({ issue, isLast }: { issue: IssueDTO; isLast: boolean }
 type SprintWithIssues = SprintDTO & { issues: IssueDTO[] }
 
 const SprintSection = ({
-  sprint, issues, defaultOpen, onCreateIssue,
-}: { sprint: SprintWithIssues; issues: IssueDTO[]; defaultOpen: boolean; onCreateIssue: () => void }) => {
+  sprint, issues, defaultOpen, onCreateIssue, onStart, onClose, onEditIssue,
+}: { 
+  sprint: SprintWithIssues; 
+  issues: IssueDTO[]; 
+  defaultOpen: boolean; 
+  onCreateIssue: () => void;
+  onStart: () => void;
+  onClose: () => void;
+  onEditIssue: (issue: IssueDTO) => void;
+}) => {
   const [open, setOpen] = useState(defaultOpen)
   const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
   const donePoints = issues.filter((i) => i.status === IssueStatus.DONE).reduce((s, i) => s + (i.storyPoints ?? 0), 0)
@@ -163,16 +172,31 @@ const SprintSection = ({
         </div>
 
         {isActive ? (
-          <button style={btnSecondaryStyle}><Square size={14} />Terminer</button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); onClose() }}
+            style={btnSecondaryStyle}
+          >
+            <Square size={14} />Terminer
+          </button>
         ) : sprint.status === SprintStatus.PLANNED ? (
-          <button style={btnPrimaryStyle}><Play size={14} />Lancer</button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); onStart() }}
+            style={btnPrimaryStyle}
+          >
+            <Play size={14} />Lancer
+          </button>
         ) : null}
       </div>
 
       {open && (
         <div style={{ borderTop: '1px solid var(--color-border)' }}>
           {issues.map((issue, i) => (
-            <BacklogIssueRow key={issue.id} issue={issue} isLast={i === issues.length - 1} />
+            <BacklogIssueRow 
+              key={issue.id} 
+              issue={issue} 
+              isLast={i === issues.length - 1} 
+              onClick={() => onEditIssue(issue)}
+            />
           ))}
           {issues.length === 0 && (
             <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-tertiary)', fontSize: 12 }}>
@@ -201,7 +225,19 @@ const SwatchCount = ({ color, n }: { color: string; n: number }) => (
   </span>
 )
 
-const BacklogPanel = ({ issues, defaultOpen, onCreateIssue }: { issues: IssueDTO[]; defaultOpen: boolean; onCreateIssue: () => void }) => {
+const BacklogPanel = ({ 
+  issues, 
+  defaultOpen, 
+  onCreateIssue, 
+  onCreateSprint,
+  onEditIssue,
+}: { 
+  issues: IssueDTO[]; 
+  defaultOpen: boolean; 
+  onCreateIssue: () => void;
+  onCreateSprint: () => void;
+  onEditIssue: (issue: IssueDTO) => void;
+}) => {
   const [open, setOpen] = useState(defaultOpen)
   const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
   return (
@@ -223,12 +259,22 @@ const BacklogPanel = ({ issues, defaultOpen, onCreateIssue }: { issues: IssueDTO
             {issues.length} issues · {totalPoints} pts à planifier
           </span>
         </div>
-        <button style={btnSecondaryStyle}><Plus size={14} />Créer un sprint</button>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onCreateSprint() }}
+          style={btnSecondaryStyle}
+        >
+          <Plus size={14} />Créer un sprint
+        </button>
       </div>
       {open && (
         <div style={{ borderTop: '1px solid var(--color-border)' }}>
           {issues.map((issue, i) => (
-            <BacklogIssueRow key={issue.id} issue={issue} isLast={i === issues.length - 1} />
+            <BacklogIssueRow 
+              key={issue.id} 
+              issue={issue} 
+              isLast={i === issues.length - 1} 
+              onClick={() => onEditIssue(issue)}
+            />
           ))}
           {issues.length === 0 && (
             <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-tertiary)', fontSize: 13 }}>
@@ -253,17 +299,31 @@ const BacklogPanel = ({ issues, defaultOpen, onCreateIssue }: { issues: IssueDTO
 
 const Backlog = () => {
   const { projectId } = useParams<{ projectId: string }>()
-  const { backlogIssues, sprints, fetchBacklog, fetchProjectData, createIssue } = useProject()
+  const { 
+    backlogIssues, sprints, fetchBacklog, fetchProjectData, 
+    createIssue, updateIssue, createSprint, startSprint, closeSprint 
+  } = useProject()
   const [searchQ, setSearchQ] = useState('')
   const [typeFilter, setTypeFilter] = useState<IssueType | null>(null)
-  const [modalData, setModalData] = useState<{ open: boolean; sprintId?: string | null }>({ open: false })
+  const [modalData, setModalData] = useState<{ open: boolean; sprintId?: string | null; issue?: IssueDTO }>({ open: false })
 
-  const handleCreate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
-    const issue = await createIssue(data as CreateIssueRequestDTO)
-    if (issue && projectId) {
+  const handleCreateOrUpdate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
+    if (modalData.issue) {
+      await updateIssue(modalData.issue.id, data as UpdateIssueRequestDTO)
+    } else {
+      await createIssue(data as CreateIssueRequestDTO)
+    }
+    
+    if (projectId) {
       await fetchBacklog(projectId)
     }
     setModalData({ open: false })
+  }
+
+  const handleCreateSprint = async () => {
+    if (projectId) {
+      await createSprint(projectId)
+    }
   }
 
   useEffect(() => {
@@ -347,15 +407,30 @@ const Backlog = () => {
             issues={sprint.issues.filter(filter)}
             defaultOpen={sprint.status === SprintStatus.ACTIVE}
             onCreateIssue={() => setModalData({ open: true, sprintId: sprint.id })}
+            onStart={() => sprint.id && startSprint(sprint.id)}
+            onClose={() => sprint.id && closeSprint(sprint.id)}
+            onEditIssue={(issue) => setModalData({ open: true, issue })}
           />
         ))}
-        <BacklogPanel issues={backlogIssues.filter(filter)} defaultOpen={true} onCreateIssue={() => setModalData({ open: true })} />
+        <BacklogPanel 
+          issues={backlogIssues.filter(filter)} 
+          defaultOpen={true} 
+          onCreateIssue={() => setModalData({ open: true })} 
+          onCreateSprint={handleCreateSprint}
+          onEditIssue={(issue) => setModalData({ open: true, issue })}
+        />
       </div>
 
       {modalData.open && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: 12, width: 400 }}>
-            <IssueForm projectId={projectId!} sprintId={modalData.sprintId} onSubmit={handleCreate} onCancel={() => setModalData({ open: false })} />
+            <IssueForm 
+              projectId={projectId!} 
+              sprintId={modalData.sprintId} 
+              initialData={modalData.issue}
+              onSubmit={handleCreateOrUpdate} 
+              onCancel={() => setModalData({ open: false })} 
+            />
           </div>
         </div>
       )}
