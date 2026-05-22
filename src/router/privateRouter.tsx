@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import HomeLayout from "../pages/layout/home.layout"
 import NewsPage from "../pages/news"
 import MessagePage from "../pages/message"
@@ -23,23 +23,24 @@ const PrivateRoute = () => {
                                 path="/" 
                                 element={<HomeLayout/>}
                             >
-                            <Route
-                                path=""
-                                element={<NewsPage/>}
-                            />
-                            <Route
-                                path="message"
-                                element={<MessagePage/>}
-                            />
-                            <Route path="projects">
-                                <Route path="" element={<ProjectList />} />
-                                <Route path=":projectId" element={<ProjectLayout />}>
-                                    <Route path="board" element={<Board />} />
-                                    <Route path="backlog" element={<Backlog />} />
+                                <Route
+                                    path=""
+                                    element={<NewsPage/>}
+                                />
+                                <Route
+                                    path="message"
+                                    element={<MessagePage/>}
+                                />
+                                <Route path="projects">
+                                    <Route path="" element={<ProjectList />} />
+                                    <Route path=":projectId" element={<ProjectLayout />}>
+                                        <Route path="board" element={<Board />} />
+                                        <Route path="backlog" element={<Backlog />} />
+                                    </Route>
                                 </Route>
                             </Route>
-                        </Route>
-                    </Routes>
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
                     </ProjectProvider>
                 </SSEProvider>
             </PostProvider>

@@ -51,6 +51,8 @@ const SignupPage = () => {
         lastName: lastName.trim(),
         phoneNumber: phoneNumber.trim(),
       })
+      alert("Compte créé avec succès !")
+      navigate("/")
     } catch {
       // alert déjà géré dans AuthProvider
     } finally {
