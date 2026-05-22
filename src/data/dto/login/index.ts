@@ -11,3 +11,13 @@ export interface GoogleLoginDTO {
     deviceInfo? : string
     picture?:string
 }
+
+export interface SubscribeDTO {
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    phoneNumber: string
+    birthDate?: string | null
+    deviceInfo?: string
+}

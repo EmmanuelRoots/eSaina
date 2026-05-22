@@ -1,6 +1,7 @@
 export const urls = {
   user : {
     LOGIN: `/user/login`,
+    SUBSCRIBE: `/user/subscribe`,
     REFRESH_TOKEN : `/user/refresh`,
     GET_USER_BY_TOKEN : `/user/me`,
     LOGOUT : `/user/logout`,

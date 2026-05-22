@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useGoogleLogin } from "@react-oauth/google"
+import { useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
 import { GoogleLogin } from "@react-oauth/google"
 import { jwtDecode } from "jwt-decode"
@@ -13,6 +13,7 @@ import "./login.css"
 
 const LoginPage = () => {
   const { login } = UseAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPw, setShowPw] = useState(false)
@@ -161,7 +162,14 @@ const LoginPage = () => {
           </form>
 
           <div className="login-footer-link">
-            Pas encore de compte ? <a href="#" style={{ fontWeight: 600 }}>Demander un accès</a>
+            Pas encore de compte ?{' '}
+            <a
+              href="/signup"
+              onClick={(e) => { e.preventDefault(); navigate('/signup') }}
+              style={{ fontWeight: 600 }}
+            >
+              Créer un compte
+            </a>
           </div>
         </div>
       </div>
