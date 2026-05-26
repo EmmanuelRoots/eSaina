@@ -2,7 +2,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import {
   Newspaper, MessageSquare, Columns3, List, Map, BarChart3, FolderKanban,
   ChevronsUpDown, Settings, PanelLeftOpen, PanelLeftClose, ShieldCheck,
-  Users,
+  Users, UsersRound, Users2,
   type LucideIcon,
 } from "lucide-react"
 import { UseAuth } from "../../context/user"
@@ -65,6 +65,8 @@ export const Sidebar = ({ collapsed, onToggle }: Props) => {
   if (roleName === 'SUPER_ADMIN' || roleName === 'ADMIN') {
     const adminItems: NavItem[] = [
       { id: 'users', label: 'Gestion des utilisateurs', Icon: Users, path: '/admin/users' },
+      { id: 'groups', label: 'Gestion des groupes', Icon: UsersRound, path: '/admin/groups' },
+      { id: 'teams', label: 'Gestion des équipes', Icon: Users2, path: '/admin/teams' },
     ]
     if (roleName === 'SUPER_ADMIN') {
       adminItems.push({ id: 'roles', label: 'Gestion des rôles', Icon: ShieldCheck, path: '/admin/roles' })
