@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import GenericForm from "../../form"
 import Modal from "../../modal"
-import { ModalBody } from "../../modal/body"
+import ModalBody from "../../modal/body"
 import ModalHeader from "../../modal/header"
 import Text from "../../text"
 import { conversationFromFactory } from "../../../services/factory/createConversation.factory"

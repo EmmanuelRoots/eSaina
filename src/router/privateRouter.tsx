@@ -10,9 +10,10 @@ import ProjectList from "../pages/project/ProjectList"
 import Board from "../pages/project/Board"
 import Backlog from "../pages/project/Backlog"
 import ProjectLayout from "../pages/project/ProjectLayout"
+import RoleManagement from "../pages/admin/RoleManagement"
 
 const PrivateRoute = () => {
-    
+
     return (
         <ConversationProvider>
             <PostProvider>
@@ -37,6 +38,9 @@ const PrivateRoute = () => {
                                         <Route path="board" element={<Board />} />
                                         <Route path="backlog" element={<Backlog />} />
                                     </Route>
+                                </Route>
+                                <Route path="admin">
+                                    <Route path="roles" element={<RoleManagement />} />
                                 </Route>
                             </Route>
                             <Route path="*" element={<Navigate to="/" replace />} />

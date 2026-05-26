@@ -61,4 +61,11 @@ export const urls = {
     LIST: (projectId: string) => `/label/list?projectId=${projectId}`,
     DELETE: (id: string) => `/label/${id}`,
     },
+    role: {
+    GET_ALL: `/roles`,
+    GET_TABLES: `/roles/tables`,
+    CREATE: `/roles`,
+    UPDATE: (id: string) => `/roles/${id}`,
+    DELETE: (id: string) => `/roles/${id}`,
+    },
     }

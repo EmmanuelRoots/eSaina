@@ -3,8 +3,8 @@ import { FolderKanban, Hash, Type, AlignLeft, Loader2 } from "lucide-react";
 import { type CreateProjectRequestDTO } from "../../data/dto/project/index";
 import projectApi from "../../services/api/project.api";
 import ModalHeader from "../../components/modal/header";
-import { ModalBody } from "../../components/modal/body";
-import { ModalFooter } from "../../components/modal/footer";
+import ModalBody from "../../components/modal/body";
+import ModalFooter from "../../components/modal/footer";
 import { useModalContext } from "../../context/modal";
 
 interface ProjectFormProps {
