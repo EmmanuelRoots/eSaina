@@ -11,6 +11,7 @@ import Board from "../pages/project/Board"
 import Backlog from "../pages/project/Backlog"
 import ProjectLayout from "../pages/project/ProjectLayout"
 import RoleManagement from "../pages/admin/RoleManagement"
+import UserManagement from "../pages/admin/UserManagement"
 
 const PrivateRoute = () => {
 
@@ -41,6 +42,7 @@ const PrivateRoute = () => {
                                 </Route>
                                 <Route path="admin">
                                     <Route path="roles" element={<RoleManagement />} />
+                                    <Route path="users" element={<UserManagement />} />
                                 </Route>
                             </Route>
                             <Route path="*" element={<Navigate to="/" replace />} />

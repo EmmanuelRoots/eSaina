@@ -2,6 +2,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import {
   Newspaper, MessageSquare, Columns3, List, Map, BarChart3, FolderKanban,
   ChevronsUpDown, Settings, PanelLeftOpen, PanelLeftClose, ShieldCheck,
+  Users,
   type LucideIcon,
 } from "lucide-react"
 import { UseAuth } from "../../context/user"
@@ -59,14 +60,16 @@ export const Sidebar = ({ collapsed, onToggle }: Props) => {
     },
   ]
 
-  // Add Admin section for Super Admins
-  if (user?.role?.name === "SUPER_ADMIN") {
-    sections.push({
-      label: 'Administration',
-      items: [
-        { id: 'roles', label: 'Gestion des rôles', Icon: ShieldCheck, path: '/admin/roles' },
-      ],
-    })
+  // Section Administration : SUPER_ADMIN voit tout, ADMIN voit la gestion des utilisateurs uniquement.
+  const roleName = user?.role?.name
+  if (roleName === 'SUPER_ADMIN' || roleName === 'ADMIN') {
+    const adminItems: NavItem[] = [
+      { id: 'users', label: 'Gestion des utilisateurs', Icon: Users, path: '/admin/users' },
+    ]
+    if (roleName === 'SUPER_ADMIN') {
+      adminItems.push({ id: 'roles', label: 'Gestion des rôles', Icon: ShieldCheck, path: '/admin/roles' })
+    }
+    sections.push({ label: 'Administration', items: adminItems })
   }
 
   const width = collapsed ? 64 : 240

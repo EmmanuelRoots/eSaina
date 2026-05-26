@@ -68,4 +68,10 @@ export const urls = {
     UPDATE: (id: string) => `/roles/${id}`,
     DELETE: (id: string) => `/roles/${id}`,
     },
+    adminUser: {
+    LIST: `/admin/users`,
+    UPDATE: (id: string) => `/admin/users/${id}`,
+    RESET_PASSWORD: (id: string) => `/admin/users/${id}/reset-password`,
+    DELETE: (id: string) => `/admin/users/${id}`,
+    },
     }
