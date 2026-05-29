@@ -1,6 +1,6 @@
 import { useState, type HTMLAttributes } from "react"
 import type { SalonDTO } from "../../../data/dto/post"
-
+import { useThemeColors } from "../../../hooks/theme"
 import { Hash, TrendingUp } from "lucide-react"
 
 type SalonItemProps = HTMLAttributes<HTMLDivElement> & {
@@ -9,8 +9,8 @@ type SalonItemProps = HTMLAttributes<HTMLDivElement> & {
 
 export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
   const [isHovered, setIsHovered] = useState(false)
-  const { theme, colors } = useTheme()
-  const isDark = theme === 'dark'
+  const colors = useThemeColors()
+  const isDark = colors.mode === 'dark'
 
   return (
     <div

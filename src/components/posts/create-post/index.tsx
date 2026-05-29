@@ -3,13 +3,13 @@ import { UseAuth } from "../../../context/user"
 import { Card, CardBody } from "../../card"
 import Row from "../../row"
 import { CreatePostModal } from "./create-post-modal"
-
+import { useThemeColors } from "../../../hooks/theme"
 import { Edit3 } from "lucide-react"
 
 export const CreatePost = () => {
   const { user } = UseAuth()
-  const { theme, colors } = useTheme()
-  const isDark = theme === 'dark'
+  const colors = useThemeColors()
+  const isDark = colors.mode === 'dark'
   const [open, setOpen] = useState<boolean>(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -49,7 +49,7 @@ export const CreatePost = () => {
                 background: isDark
                   ? isHovered
                     ? `${colors.secondary}15`
-                    : `${colors.secondaryBackground}`
+                    : `${colors.surface2}`
                   : isHovered
                     ? `${colors.secondary}10`
                     : '#f0f2f5',
