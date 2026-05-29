@@ -93,7 +93,13 @@ const LoginPage = () => {
           <p className="login-subtitle">Connectez-vous pour continuer sur votre workspace.</p>
 
           <div style={{ width: '100%' }}>
-            <GoogleLogin onSuccess={onGoogleSuccess} useOneTap={false} />
+            <GoogleLogin
+                onSuccess={onGoogleSuccess}
+                useOneTap={false}
+                text="continue_with"
+                size="large"
+                shape="rectangular"
+              />
           </div>
 
           <div className="login-divider">
