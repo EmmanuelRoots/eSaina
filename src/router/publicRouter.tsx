@@ -1,5 +1,6 @@
 
 import LoginPage from "../pages/login";
+import SignupPage from "../pages/signup";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 const PublicRoute = ()=> {
@@ -7,15 +8,19 @@ const PublicRoute = ()=> {
     return (
         <Routes>
             <Route
-                path="/" 
+                path="/"
                 element={<LoginPage/>}
             />
             <Route
-                path="*" 
+                path="/signup"
+                element={<SignupPage/>}
+            />
+            <Route
+                path="*"
                 element={<Navigate to="/" replace />}
             />
         </Routes>
-        
+
     )
 }
 

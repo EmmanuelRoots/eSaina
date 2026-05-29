@@ -57,7 +57,7 @@ export const ProfileCard = () => {
                         </span>
                         <span style={{
                             fontSize: '0.85rem',
-                            color: colors.secondaryText,
+                            color: colors.textSecondary,
                             fontWeight: 500
                         }}>
                             @{user?.firstName?.toLowerCase()}{user?.lastName?.toLowerCase()}

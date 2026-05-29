@@ -14,7 +14,7 @@
   margin: 0;
   font-size: 22px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
@@ -79,7 +79,7 @@
   background: none;
   border: none;
   font-size: 24px;
-  color: #9ca3af;
+  color: var(--color-text-tertiary);
   cursor: pointer;
   padding: 0;
   width: 36px;
@@ -95,7 +95,7 @@
 }
 
 .modal-close-button:hover {
-  color: #4b5563;
-  background-color: #f3f4f6;
+  color: var(--color-text);
+  background-color: var(--color-surface2);
   transform: rotate(90deg);
 }

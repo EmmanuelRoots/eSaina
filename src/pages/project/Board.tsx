@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import {
-  Search, Filter, Eye, Sparkles, Flag, Square, Plus, MoreHorizontal, X,
+  Search, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check, Settings2,
 } from "lucide-react"
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
@@ -13,19 +13,16 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useProject } from "../../context/project/useProject"
-import { IssueStatus, IssueType, type IssueDTO } from "../../data/dto/issue"
+import { type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
 import { SprintStatus } from "../../data/dto/sprint"
 import Column from "../../components/column"
 import Row from "../../components/row"
 import { Avatar } from "../../components/avatar"
 import { IssueCard } from "../../components/issue/IssueCard"
+import { IssueForm } from "../../components/issue/IssueForm"
+import { StatusManagementModal } from "../../components/project/StatusManagementModal"
 
-const COLUMNS: Array<{ status: IssueStatus; label: string; accent: string }> = [
-  { status: IssueStatus.TODO,        label: 'À faire',     accent: '#94a3b8' },
-  { status: IssueStatus.IN_PROGRESS, label: 'En cours',    accent: '#3b82f6' },
-  { status: IssueStatus.IN_REVIEW,   label: 'En révision', accent: '#f59e0b' },
-  { status: IssueStatus.DONE,        label: 'Terminé',     accent: '#10b981' },
-]
+const storageKey = (projectId: string) => `board-columns-v2-${projectId}`
 
 const daysBetween = (a: string, b: string) =>
   Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000))
@@ -34,12 +31,96 @@ const Board = () => {
   const { projectId } = useParams<{ projectId: string }>()
   const {
     boardIssues, fetchBoard, fetchProjectData, currentProject, sprints, fetchBacklog,
-    createIssue, moveIssue,
+    createIssue, updateIssue, moveIssue,
   } = useProject()
   const [searchQ, setSearchQ] = useState('')
   const [activeAssignee, setActiveAssignee] = useState<string | null>(null)
-  const [creatingIn, setCreatingIn] = useState<IssueStatus | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [modalData, setModalData] = useState<{ open: boolean; statusId?: string; issue?: IssueDTO }>({ open: false })
+  const [showAddMenu, setShowAddMenu] = useState(false)
+  const [showViewMenu, setShowViewMenu] = useState(false)
+  const [showStatusModal, setShowStatusModal] = useState(false)
+  const addMenuRef = useRef<HTMLDivElement>(null)
+  const viewMenuRef = useRef<HTMLDivElement>(null)
+
+  const [visibleStatusIds, setVisibleStatusIds] = useState<string[]>([])
+
+  useEffect(() => {
+    if (currentProject?.statuses) {
+      try {
+        const stored = localStorage.getItem(storageKey(currentProject.id))
+        if (stored) {
+          const ids = JSON.parse(stored) as string[]
+          // Filter to only include IDs that still exist
+          const validIds = ids.filter(id => currentProject.statuses?.some(s => s.id === id))
+          setVisibleStatusIds(validIds.length > 0 ? validIds : currentProject.statuses.map(s => s.id))
+        } else {
+          setVisibleStatusIds(currentProject.statuses.map(s => s.id))
+        }
+      } catch {
+        setVisibleStatusIds(currentProject.statuses.map(s => s.id))
+      }
+    }
+  }, [currentProject?.statuses, currentProject?.id])
+
+  const allColumns = useMemo(() => {
+    if (!currentProject?.statuses) return []
+    return currentProject.statuses.map(s => ({
+      statusId: s.id,
+      label: s.name,
+      accent: s.color
+    }))
+  }, [currentProject?.statuses])
+
+  // L'ordre suit visibleStatusIds (localStorage), pas allColumns (serveur) —
+  // sinon un drag dans le modal serait écrasé par la réponse API.
+  const visibleColumns = visibleStatusIds
+    .map((id) => allColumns.find((c) => c.statusId === id))
+    .filter((c): c is NonNullable<typeof c> => c !== undefined)
+  const hiddenColumns = allColumns.filter((c) => !visibleStatusIds.includes(c.statusId))
+
+  const persistColumns = (next: string[]) => {
+    if (projectId) localStorage.setItem(storageKey(projectId), JSON.stringify(next))
+    setVisibleStatusIds(next)
+  }
+
+  const addColumn = (statusId: string) => {
+    persistColumns([...visibleStatusIds, statusId])
+    setShowAddMenu(false)
+  }
+
+  const removeColumn = (statusId: string) => {
+    persistColumns(visibleStatusIds.filter((id) => id !== statusId))
+  }
+
+  const toggleColumn = (statusId: string) => {
+    if (visibleStatusIds.includes(statusId)) {
+      removeColumn(statusId)
+    } else {
+      persistColumns([...visibleStatusIds, statusId])
+    }
+  }
+
+  const showAllColumns = () => {
+    persistColumns(allColumns.map(c => c.statusId))
+    setShowViewMenu(false)
+  }
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    if (!showAddMenu && !showViewMenu) return
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (showAddMenu && addMenuRef.current && !addMenuRef.current.contains(target)) {
+        setShowAddMenu(false)
+      }
+      if (showViewMenu && viewMenuRef.current && !viewMenuRef.current.contains(target)) {
+        setShowViewMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showAddMenu, showViewMenu])
 
   useEffect(() => {
     if (projectId) {
@@ -79,11 +160,11 @@ const Board = () => {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
-  const findIssueById = (id: string): { issue: IssueDTO; status: IssueStatus; index: number } | null => {
-    for (const col of COLUMNS) {
-      const list = boardIssues[col.status] ?? []
+  // Search all loaded board issues, not just visible columns
+  const findIssueById = (id: string): { issue: IssueDTO; statusKey: string; index: number } | null => {
+    for (const [statusKey, list] of Object.entries(boardIssues)) {
       const idx = list.findIndex((i) => i.id === id)
-      if (idx !== -1) return { issue: list[idx], status: col.status, index: idx }
+      if (idx !== -1) return { issue: list[idx], statusKey, index: idx }
     }
     return null
   }
@@ -102,55 +183,49 @@ const Board = () => {
     if (!sourceInfo) return
 
     const overId = String(over.id)
-    // Drop targets: another issue id (sortable) or a column droppable id `col:<STATUS>`.
-    let toStatus: IssueStatus | null = null
+    let toStatusKey: string | null = null
     let toIndex = 0
 
     if (overId.startsWith('col:')) {
-      toStatus = overId.slice(4) as IssueStatus
-      toIndex = (boardIssues[toStatus] ?? []).length
+      toStatusKey = overId.slice(4)
+      toIndex = (boardIssues[toStatusKey] ?? []).length
     } else {
       const overInfo = findIssueById(overId)
       if (!overInfo) return
-      toStatus = overInfo.status
+      toStatusKey = overInfo.statusKey
       toIndex = overInfo.index
-      // When dropping in the same column past the original index, account for the removal.
-      if (sourceInfo.status === toStatus && sourceInfo.index < toIndex) {
+      if (sourceInfo.statusKey === toStatusKey && sourceInfo.index < toIndex) {
         toIndex -= 1
       }
     }
 
-    if (!toStatus) return
-    if (toStatus === sourceInfo.status && toIndex === sourceInfo.index) return
+    if (!toStatusKey) return
+    if (toStatusKey === sourceInfo.statusKey && toIndex === sourceInfo.index) return
 
-    moveIssue(sourceInfo.issue.id, sourceInfo.status, toStatus, toIndex)
+    moveIssue(sourceInfo.issue.id, sourceInfo.statusKey, toStatusKey, toIndex)
   }
 
-  const handleCreate = async (status: IssueStatus, title: string) => {
-    if (!projectId || !title.trim()) {
-      setCreatingIn(null)
-      return
+  const handleCreateOrUpdate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
+    if (modalData.issue) {
+      await updateIssue(modalData.issue.id, data as UpdateIssueRequestDTO)
+    } else {
+      await createIssue({
+        ...(data as CreateIssueRequestDTO),
+        sprintId: activeSprint?.id,
+        statusId: modalData.statusId,
+      })
     }
-    const created = await createIssue({
-      projectId,
-      title: title.trim(),
-      type: IssueType.TASK,
-      sprintId: activeSprint?.id,
-    })
-    // Backend creates issues in TODO; if user wanted another column, move it right away.
-    if (created && status !== IssueStatus.TODO) {
-      const targetIdx = (boardIssues[status]?.length ?? 0)
-      await moveIssue(created.id, IssueStatus.TODO, status, targetIdx)
-    }
-    setCreatingIn(null)
+    if (projectId) fetchBoard(projectId)
+    setModalData({ open: false })
   }
 
   return (
+    <>
     <DndContext sensors={sensors} collisionDetection={closestCorners}
       onDragStart={handleDragStart} onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveDragId(null)}
     >
-      <Column style={{ height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
+      <Column style={{ height: '100%', overflow: 'hidden' }}>
         {/* Sprint banner */}
         {activeSprint && (
           <div style={{
@@ -239,8 +314,77 @@ const Board = () => {
 
           <span style={{ flex: 1 }} />
 
-          <button style={btnSecondaryStyle}><Filter size={14} />Filtres</button>
-          <button style={btnSecondaryStyle}><Eye size={14} />Vue</button>
+          <button style={btnSecondaryStyle} onClick={() => setShowStatusModal(true)}>
+            <Settings2 size={14} /> Colonnes
+          </button>
+          
+          <div ref={viewMenuRef} style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setShowViewMenu(!showViewMenu)}
+              style={btnSecondaryStyle}
+            >
+              <Eye size={14} />Vue
+            </button>
+            {showViewMenu && (
+              <div style={{
+                position: 'absolute', top: 38, right: 0, zIndex: 60,
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 10, padding: 6,
+                minWidth: 220,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--color-text-tertiary)', padding: '4px 8px 8px' }}>
+                  Colonnes visibles
+                </div>
+                {allColumns.map((col) => {
+                  const isVisible = visibleStatusIds.includes(col.statusId)
+                  return (
+                    <button
+                      key={col.statusId}
+                      onClick={() => toggleColumn(col.statusId)}
+                      style={{
+                        width: '100%', padding: '8px 10px', borderRadius: 7,
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        fontSize: 13, fontWeight: 500, color: 'var(--color-text)',
+                        background: 'transparent', textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface2)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                    >
+                      <div style={{ 
+                        width: 16, height: 16, borderRadius: 4, 
+                        border: '1.5px solid var(--color-border-strong)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: isVisible ? 'var(--color-primary)' : 'transparent',
+                        borderColor: isVisible ? 'var(--color-primary)' : 'var(--color-border-strong)',
+                      }}>
+                        {isVisible && <Check size={12} color="white" strokeWidth={3} />}
+                      </div>
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: col.accent, flexShrink: 0 }} />
+                      {col.label}
+                    </button>
+                  )
+                })}
+                <div style={{ height: 1, background: 'var(--color-border)', margin: '6px 4px' }} />
+                <button
+                  onClick={showAllColumns}
+                  style={{
+                    width: '100%', padding: '8px 10px', borderRadius: 7,
+                    fontSize: 12, fontWeight: 600, color: 'var(--color-primary)',
+                    background: 'transparent', textAlign: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-primary50)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                >
+                  Tout afficher
+                </button>
+              </div>
+            )}
+          </div>
+
           <button style={btnPrimaryStyle}><Sparkles size={14} />Insights IA</button>
         </div>
 
@@ -248,26 +392,85 @@ const Board = () => {
         <div style={{
           flex: 1, margin: '16px 24px 24px',
           overflowX: 'auto', overflowY: 'hidden',
-          display: 'grid',
-          gridTemplateColumns: `repeat(${COLUMNS.length}, minmax(280px, 1fr))`,
-          gap: 16,
+          display: 'flex', gap: 16, alignItems: 'stretch',
         }}>
-          {COLUMNS.map((col) => {
-            const issues = (boardIssues[col.status] ?? []).filter(matchesFilter)
+          {visibleColumns.map((col) => {
+            const issues = (boardIssues[col.statusId] ?? []).filter(matchesFilter)
             return (
               <BoardColumn
-                key={col.status}
-                status={col.status}
+                key={col.statusId}
+                statusId={col.statusId}
                 label={col.label}
                 accent={col.accent}
                 issues={issues}
-                isCreating={creatingIn === col.status}
-                onAskCreate={() => setCreatingIn(col.status)}
-                onCancelCreate={() => setCreatingIn(null)}
-                onCreate={(title) => handleCreate(col.status, title)}
+                onAskCreate={() => setModalData({ open: true, statusId: col.statusId })}
+                onEditIssue={(issue) => setModalData({ open: true, issue, statusId: col.statusId })}
+                onRemove={() => removeColumn(col.statusId)}
               />
             )
           })}
+
+          {/* Add column button */}
+          {hiddenColumns.length > 0 && (
+            <div ref={addMenuRef} style={{ position: 'relative', flexShrink: 0 }}>
+              <button
+                onClick={() => setShowAddMenu((v) => !v)}
+                style={{
+                  width: 200, height: 46, borderRadius: 12,
+                  border: '1.5px dashed var(--color-border-strong)',
+                  background: showAddMenu ? 'var(--color-surface2)' : 'transparent',
+                  color: 'var(--color-text-tertiary)', fontSize: 12, fontWeight: 600,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  cursor: 'pointer', transition: 'all 120ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface2)'; e.currentTarget.style.color = 'var(--color-text-secondary)' }}
+                onMouseLeave={(e) => { if (!showAddMenu) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-text-tertiary)' } }}
+              >
+                <Plus size={14} /> Ajouter une colonne
+              </button>
+
+              {showAddMenu && (
+                <div style={{
+                  position: 'absolute', top: 54, left: 0, zIndex: 50,
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 10, padding: 6,
+                  minWidth: 200,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--color-text-tertiary)', padding: '4px 8px 8px' }}>
+                    Colonnes masquées
+                  </div>
+                  {hiddenColumns.map((col) => (
+                    <button
+                      key={col.statusId}
+                      onClick={() => addColumn(col.statusId)}
+                      style={{
+                        width: '100%', padding: '8px 10px', borderRadius: 7,
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        fontSize: 13, fontWeight: 500, color: 'var(--color-text)',
+                        background: 'transparent', textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface2)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                    >
+                      <span style={{ width: 10, height: 10, borderRadius: 3, background: col.accent, flexShrink: 0 }} />
+                      {col.label}
+                      <span style={{
+                        marginLeft: 'auto', fontSize: 11, fontWeight: 600,
+                        color: 'var(--color-text-tertiary)',
+                        background: 'var(--color-surface2)', border: '1px solid var(--color-border)',
+                        padding: '1px 6px', borderRadius: 8,
+                      }}>
+                        {(boardIssues[col.statusId] ?? []).length}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {!currentProject && (
@@ -275,28 +478,54 @@ const Board = () => {
         )}
       </Column>
 
+      {modalData.open && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'var(--color-surface)', borderRadius: 12, width: 400 }}>
+            <IssueForm
+              projectId={projectId!}
+              initialData={modalData.issue}
+              onSubmit={handleCreateOrUpdate}
+              onCancel={() => setModalData({ open: false })}
+            />
+          </div>
+        </div>
+      )}
+
       <DragOverlay>
         {activeIssue ? <IssueCard issue={activeIssue} style={{ cursor: 'grabbing' }} /> : null}
       </DragOverlay>
     </DndContext>
+
+    {/* Hors du DndContext du board pour éviter que le drag du modal
+        soit intercepté par le handleDragEnd des issues */}
+    {showStatusModal && projectId && (
+      <StatusManagementModal
+        projectId={projectId}
+        onReorder={(ids) => persistColumns(ids)}
+        onClose={() => {
+          setShowStatusModal(false)
+          fetchBoard(projectId)
+        }}
+      />
+    )}
+    </>
   )
 }
 
 type BoardColumnProps = {
-  status: IssueStatus
+  statusId: string
   label: string
   accent: string
   issues: IssueDTO[]
-  isCreating: boolean
   onAskCreate: () => void
-  onCancelCreate: () => void
-  onCreate: (title: string) => void
+  onEditIssue: (issue: IssueDTO) => void
+  onRemove: () => void
 }
 
 const BoardColumn = ({
-  status, label, accent, issues, isCreating, onAskCreate, onCancelCreate, onCreate,
+  statusId, label, accent, issues, onAskCreate, onEditIssue, onRemove,
 }: BoardColumnProps) => {
-  const { setNodeRef, isOver } = useDroppable({ id: `col:${status}` })
+  const { setNodeRef, isOver } = useDroppable({ id: `col:${statusId}` })
 
   return (
     <div ref={setNodeRef} style={{
@@ -305,7 +534,7 @@ const BoardColumn = ({
       borderRadius: 14,
       padding: '4px 12px 12px',
       display: 'flex', flexDirection: 'column',
-      minWidth: 0, overflow: 'hidden',
+      width: 280, flexShrink: 0,
       transition: 'background 120ms, border-color 120ms',
     }}>
       <Row style={{ alignItems: 'center', justifyContent: 'space-between', padding: '10px 4px 12px' }}>
@@ -320,7 +549,7 @@ const BoardColumn = ({
         </Row>
         <Row style={{ gap: 2 }}>
           <IconBtn onClick={onAskCreate} title="Ajouter une issue"><Plus size={16} /></IconBtn>
-          <IconBtn><MoreHorizontal size={16} /></IconBtn>
+          <IconBtn onClick={onRemove} title="Masquer la colonne"><EyeOff size={15} /></IconBtn>
         </Row>
       </Row>
 
@@ -331,11 +560,11 @@ const BoardColumn = ({
       }}>
         <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {issues.map((issue) => (
-            <SortableIssueCard key={issue.id} issue={issue} />
+            <SortableIssueCard key={issue.id} issue={issue} onEdit={() => onEditIssue(issue)} />
           ))}
         </SortableContext>
 
-        {issues.length === 0 && !isCreating && (
+        {issues.length === 0 && (
           <div style={{
             border: '1.5px dashed var(--color-border-strong)',
             borderRadius: 10, padding: '24px 12px',
@@ -343,35 +572,31 @@ const BoardColumn = ({
           }}>Déposer ici</div>
         )}
 
-        {isCreating ? (
-          <NewIssueForm onSubmit={onCreate} onCancel={onCancelCreate} />
-        ) : (
-          <button
-            onClick={onAskCreate}
-            style={{
-              marginTop: 4, padding: '10px 12px', borderRadius: 8,
-              color: 'var(--color-text-tertiary)', fontSize: 12, fontWeight: 600,
-              display: 'flex', alignItems: 'center', gap: 8,
-              transition: 'all 120ms cubic-bezier(.4,0,.2,1)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--color-surface)'
-              e.currentTarget.style.color = 'var(--color-text-secondary)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = 'var(--color-text-tertiary)'
-            }}
-          >
-            <Plus size={14} /> Créer une issue
-          </button>
-        )}
+        <button
+          onClick={onAskCreate}
+          style={{
+            marginTop: 4, padding: '10px 12px', borderRadius: 8,
+            color: 'var(--color-text-tertiary)', fontSize: 12, fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: 8,
+            transition: 'all 120ms cubic-bezier(.4,0,.2,1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--color-surface)'
+            e.currentTarget.style.color = 'var(--color-text-secondary)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent'
+            e.currentTarget.style.color = 'var(--color-text-tertiary)'
+          }}
+        >
+          <Plus size={14} /> Créer une issue
+        </button>
       </div>
     </div>
   )
 }
 
-const SortableIssueCard = ({ issue }: { issue: IssueDTO }) => {
+const SortableIssueCard = ({ issue, onEdit }: { issue: IssueDTO; onEdit: () => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: issue.id })
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -380,57 +605,8 @@ const SortableIssueCard = ({ issue }: { issue: IssueDTO }) => {
   }
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <IssueCard issue={issue} onClick={() => {}} />
+      <IssueCard issue={issue} onClick={onEdit} />
     </div>
-  )
-}
-
-const NewIssueForm = ({
-  onSubmit, onCancel,
-}: { onSubmit: (title: string) => void; onCancel: () => void }) => {
-  const [value, setValue] = useState('')
-  return (
-    <form
-      onSubmit={(e) => { e.preventDefault(); onSubmit(value) }}
-      style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 10, padding: 10,
-        display: 'flex', flexDirection: 'column', gap: 8,
-        boxShadow: 'var(--shadow-sm)',
-      }}
-    >
-      <input
-        autoFocus
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Escape') onCancel() }}
-        placeholder="Titre de l'issue…"
-        style={{
-          border: 'none', outline: 'none', background: 'transparent',
-          fontSize: 13, color: 'var(--color-text)',
-        }}
-      />
-      <Row style={{ gap: 6, justifyContent: 'flex-end' }}>
-        <button
-          type="button" onClick={onCancel}
-          style={{
-            ...btnSecondaryStyle, height: 26, padding: '0 8px', fontSize: 11,
-          }}
-        >
-          <X size={12} /> Annuler
-        </button>
-        <button
-          type="submit" disabled={!value.trim()}
-          style={{
-            ...btnPrimaryStyle, height: 26, padding: '0 10px', fontSize: 11,
-            opacity: value.trim() ? 1 : 0.5,
-          }}
-        >
-          Créer
-        </button>
-      </Row>
-    </form>
   )
 }
 

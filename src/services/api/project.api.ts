@@ -1,5 +1,6 @@
 import { urls } from "../../constants/urls"
-import type { CreateProjectRequestDTO, ProjectDTO, UpdateProjectRequestDTO } from "../../data/dto/project"
+import type { CreateProjectRequestDTO, ProjectDTO, ProjectStatusDTO, UpdateProjectRequestDTO } from "../../data/dto/project"
+import type { UserDTO } from "../../data/dto/user"
 import { axiosInstance } from "../utils/axios.utils"
 
 const getMyProjects = async (): Promise<ProjectDTO[]> => {
@@ -36,6 +37,39 @@ const getBacklog = async (id: string) => {
   return data.data
 }
 
+const getProjectStatuses = async (projectId: string): Promise<ProjectStatusDTO[]> => {
+  const { data } = await axiosInstance.get(urls.projectStatus.LIST(projectId)).catch((err) => { throw err })
+  return data.data
+}
+
+const createProjectStatus = async (projectId: string, payload: Partial<ProjectStatusDTO>): Promise<ProjectStatusDTO> => {
+  const { data } = await axiosInstance.post(urls.projectStatus.CREATE(projectId), payload).catch((err) => { throw err })
+  return data.data
+}
+
+const updateProjectStatus = async (statusId: string, payload: Partial<ProjectStatusDTO>): Promise<ProjectStatusDTO> => {
+  const { data } = await axiosInstance.patch(urls.projectStatus.UPDATE(statusId), payload).catch((err) => { throw err })
+  return data.data
+}
+
+const deleteProjectStatus = async (statusId: string): Promise<void> => {
+  await axiosInstance.delete(urls.projectStatus.DELETE(statusId)).catch((err) => { throw err })
+}
+
+const reorderProjectStatuses = async (projectId: string, statusIds: string[]): Promise<void> => {
+  await axiosInstance.post(urls.projectStatus.REORDER(projectId), { statusIds }).catch((err) => { throw err })
+}
+
+/**
+ * Retourne les utilisateurs assignables aux tickets d'un projet.
+ * Si le projet est rattaché à des équipes, seuls leurs membres sont retournés ;
+ * sinon, ce sont les membres directs du projet.
+ */
+const getAssignableMembers = async (projectId: string): Promise<UserDTO[]> => {
+  const { data } = await axiosInstance.get(urls.project.GET_ASSIGNABLE_MEMBERS(projectId)).catch((err) => { throw err })
+  return data.data
+}
+
 export default {
   getMyProjects,
   getProjectById,
@@ -43,5 +77,11 @@ export default {
   updateProject,
   deleteProject,
   getBoard,
-  getBacklog
+  getBacklog,
+  getProjectStatuses,
+  createProjectStatus,
+  updateProjectStatus,
+  deleteProjectStatus,
+  reorderProjectStatuses,
+  getAssignableMembers,
 }

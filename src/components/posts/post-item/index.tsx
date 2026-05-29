@@ -10,7 +10,7 @@ import { getTimeBetweenTwoDate } from "../../../services/utils/date.utils"
 import { UseAuth } from "../../../context/user"
 import postApi from "../../../services/api/post.api"
 import Comments from "../comment"
-import { useTheme } from "../../../hooks/theme"
+
 
 type PostItemProps = HTMLAttributes<HTMLDivElement> & {
   post: PostDTO
@@ -114,14 +114,14 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
                 alignItems: 'center',
                 gap: '6px',
                 fontSize: '0.85rem',
-                color: colors.secondaryText,
+                color: colors.textSecondary,
                 marginTop: '2px'
               }}>
-                <Text variant="caption" style={{ color: colors.secondaryText }}>
+                <Text variant="caption" style={{ color: colors.textSecondary }}>
                   {getTimeBetweenTwoDate(post.createdAt)}
                 </Text>
-                <span style={{ margin: '0 2px', color: colors.secondaryText }}>·</span>
-                <Globe size={13} color={colors.secondaryText} />
+                <span style={{ margin: '0 2px', color: colors.textSecondary }}>·</span>
+                <Globe size={13} color={colors.textSecondary} />
               </Row>
             </Column>
           </Row>
@@ -162,7 +162,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
                 </div>
                 <Text style={{
                   fontSize: '0.9rem',
-                  color: colors.secondaryText,
+                  color: colors.textSecondary,
                   fontWeight: 500
                 }}>
                   {reactions.length}
@@ -172,7 +172,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
             {post.comments.length > 0 && (
               <Text style={{
                 fontSize: '0.9rem',
-                color: colors.secondaryText,
+                color: colors.textSecondary,
                 cursor: 'pointer',
                 transition: 'color 0.2s ease'
               }}>
@@ -212,7 +212,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
                 cursor: 'pointer',
                 fontSize: '0.95rem',
                 fontWeight: 600,
-                color: liked ? colors.primary : colors.secondaryText,
+                color: liked ? colors.primary : colors.textSecondary,
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 transform: isLikeHovered ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: isLikeHovered
@@ -223,7 +223,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
               <ThumbsUp
                 size={20}
                 fill={liked ? colors.primary : "none"}
-                color={liked ? colors.primary : colors.secondaryText}
+                color={liked ? colors.primary : colors.textSecondary}
                 style={{
                   transition: 'all 0.25s ease',
                   transform: isLikeHovered ? 'scale(1.1)' : 'scale(1)'
@@ -252,7 +252,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
                 cursor: 'pointer',
                 fontSize: '0.95rem',
                 fontWeight: 600,
-                color: showComments ? colors.secondary : colors.secondaryText,
+                color: showComments ? colors.secondary : colors.textSecondary,
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 transform: isCommentHovered ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: isCommentHovered
@@ -262,7 +262,7 @@ const PostItem = ({ post, ...rest }: PostItemProps) => {
             >
               <MessageCircle
                 size={20}
-                color={showComments ? colors.secondary : colors.secondaryText}
+                color={showComments ? colors.secondary : colors.textSecondary}
                 style={{
                   transition: 'all 0.25s ease',
                   transform: isCommentHovered ? 'scale(1.1)' : 'scale(1)'

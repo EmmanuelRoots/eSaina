@@ -29,6 +29,10 @@
   }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -46,9 +50,10 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-height: 90vh;
   overflow: hidden;

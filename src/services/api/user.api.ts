@@ -1,10 +1,16 @@
 import { LocalStorageKeys } from "../../constants/storage.constant"
 import { urls } from "../../constants/urls"
-import type { GoogleLoginDTO, LoginDTO } from "../../data/dto/login"
+import type { GoogleLoginDTO, LoginDTO, SubscribeDTO } from "../../data/dto/login"
 import { axiosInstance } from "../utils/axios.utils"
 
 const logUser = async (credentials: LoginDTO) => {
   const {data} = await axiosInstance.post(urls.user.LOGIN, credentials).catch((err)=> {throw err})
+
+  return data
+}
+
+const subscribe = async (credentials: SubscribeDTO) => {
+  const {data} = await axiosInstance.post(urls.user.SUBSCRIBE, credentials).catch((err)=> {throw err})
 
   return data
 }
@@ -38,6 +44,7 @@ const searchUser = async ({page=1,limit=20,searchTerm=''}:{page:number, limit:nu
 
 export default {
   logUser,
+  subscribe,
   getUserByToken,
   logOut,
   googleLogin,

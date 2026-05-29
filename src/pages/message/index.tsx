@@ -348,11 +348,11 @@ const MessagePage = () => {
                   loading={msgsLoading}
                   loadMore={loadMoreMessages}
                   direction="top"
-                  renderItem={(m, i) => (
+                  renderItem={(m: MessageDTO) => (
                     <MessageBubble
-                      key={m.id ?? i}
+                      key={m.id ?? 'msg'}
                       msg={m}
-                      prev={messages[i - 1]}
+                      prev={undefined}
                       currentUserId={user?.id}
                     />
                   )}

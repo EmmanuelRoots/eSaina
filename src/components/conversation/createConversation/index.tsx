@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import GenericForm from "../../form"
 import Modal from "../../modal"
-import { ModalBody } from "../../modal/body"
+import ModalBody from "../../modal/body"
 import ModalHeader from "../../modal/header"
 import Text from "../../text"
 import { conversationFromFactory } from "../../../services/factory/createConversation.factory"
@@ -87,11 +87,11 @@ const CreateConversationModal = ({open, oncClose, onFinished}:CreateConvModalPro
       title : conv.title,
       type : ConversationType.DIRECT,
       members : [{
-          userId : conv.userId.id,
+          user : { id: conv.userId.id },
           role : MemberRole.MEMBER
         },
         {
-          userId : user?.id,
+          user : { id: user?.id },
           role : MemberRole.ADMIN
         }
       ]
