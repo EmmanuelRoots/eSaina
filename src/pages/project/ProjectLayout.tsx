@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useParams, useLocation } from "react-router-dom"
 import { useEffect } from "react"
-import { Columns3, List, ChevronRight, Map, BarChart3 } from "lucide-react"
+import { Columns3, List, ChevronRight, Map, Timer } from "lucide-react"
 import { useProject } from "../../context/project"
 
 const ProjectLayout = () => {
@@ -17,8 +17,8 @@ const ProjectLayout = () => {
   const tabs = [
     { label: 'Tableau',  path: 'board',   Icon: Columns3 },
     { label: 'Backlog',  path: 'backlog', Icon: List },
-    { label: 'Roadmap',  path: 'roadmap', Icon: Map,       soon: true },
-    { label: 'Rapports', path: 'reports', Icon: BarChart3, soon: true },
+    { label: 'Roadmap',  path: 'roadmap', Icon: Map,   soon: true },
+    { label: 'Tempo',    path: 'tempo',   Icon: Timer },
   ]
 
   return (

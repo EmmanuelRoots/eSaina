@@ -1,8 +1,10 @@
 import { useState, type JSX } from "react";
 import type { ProjectDTO, ProjectStatusDTO } from "../../data/dto/project";
+import { StatusCategory } from "../../data/dto/project";
 import {
   type CreateIssueRequestDTO,
   type IssueDTO,
+  IssueStatus,
   type UpdateIssueRequestDTO,
 } from "../../data/dto/issue";
 import type { SprintDTO } from "../../data/dto/sprint";
@@ -127,12 +129,38 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
     try {
       const updated = await issueApi.updateIssue(issueId, payload);
       
-      // Update Board state
+      // Update Board state — déplace le ticket si son statusId a changé.
       setBoardIssues((prev) => {
+        const newKey = updated.statusId;
         const next: Record<string, IssueDTO[]> = {};
-        for (const [status, list] of Object.entries(prev)) {
-          next[status] = list.map((i) => (i.id === updated.id ? updated : i));
+        let oldKey: string | null = null;
+        let oldIdx = -1;
+
+        // Retirer le ticket de sa colonne actuelle
+        for (const [key, list] of Object.entries(prev)) {
+          const idx = list.findIndex((i) => i.id === updated.id);
+          if (idx !== -1) {
+            oldKey = key;
+            oldIdx = idx;
+            next[key] = list.filter((i) => i.id !== updated.id);
+          } else {
+            next[key] = list;
+          }
         }
+
+        // Insérer le ticket dans la bonne colonne
+        const targetKey = newKey || oldKey;
+        if (targetKey) {
+          const targetList = [...(next[targetKey] ?? [])];
+          if (oldKey === targetKey && oldIdx !== -1) {
+            // Même colonne : réinsérer à la position d'origine pour éviter le saut visuel
+            targetList.splice(Math.min(oldIdx, targetList.length), 0, updated);
+          } else {
+            targetList.push(updated);
+          }
+          next[targetKey] = targetList;
+        }
+
         return next;
       });
 
@@ -169,33 +197,37 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
       if (movingIdx === -1) return prev;
       const [moving] = fromCol.splice(movingIdx, 1);
       const next: Record<string, IssueDTO[]> = { ...prev, [fromStatus]: fromCol };
-      const toCol =
-        fromStatus === toStatus ? fromCol : [...(prev[toStatus] ?? [])];
+      const toCol = fromStatus === toStatus ? fromCol : [...(prev[toStatus] ?? [])];
       const safeIdx = Math.max(0, Math.min(toIndex, toCol.length));
-      
-      const updatedMoving = { ...moving };
-      if (toStatus.length > 20) { // Assume UUID for statusId
-        updatedMoving.statusId = toStatus;
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        updatedMoving.status = toStatus as any;
+
+      // Mise à jour optimiste : statusId + dérivation de status depuis les statuts du projet
+      const updatedMoving = { ...moving, statusId: toStatus };
+      const targetProjectStatus = currentProject?.statuses?.find((s) => s.id === toStatus);
+      if (targetProjectStatus) {
+        if (targetProjectStatus.category === StatusCategory.TODO)
+          updatedMoving.status = IssueStatus.TODO;
+        else if (targetProjectStatus.category === StatusCategory.IN_PROGRESS)
+          updatedMoving.status = IssueStatus.IN_PROGRESS;
+        else if (targetProjectStatus.category === StatusCategory.DONE)
+          updatedMoving.status = IssueStatus.DONE;
       }
-      
+
       toCol.splice(safeIdx, 0, updatedMoving);
       next[toStatus] = toCol;
       return next;
     });
     try {
+      // toStatus est toujours un statusId (UUID) car les clés de boardIssues sont des statusId
       const payload: UpdateIssueRequestDTO = { position: toIndex };
       if (fromStatus !== toStatus) {
-        if (toStatus.length > 20) {
-          payload.statusId = toStatus;
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          payload.status = toStatus as any;
-        }
+        payload.statusId = toStatus;
       }
-      await issueApi.updateIssue(issueId, payload);
+      const updated = await issueApi.updateIssue(issueId, payload);
+      // Remplacer l'optimistic par la réponse serveur (status + statusId définitifs)
+      setBoardIssues((prev) => ({
+        ...prev,
+        [toStatus]: (prev[toStatus] ?? []).map((i) => (i.id === issueId ? updated : i)),
+      }));
     } catch (error) {
       console.error("Error moving issue, rolling back", error);
       if (snapshot) setBoardIssues(snapshot);

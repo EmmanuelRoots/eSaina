@@ -14,6 +14,7 @@ import RoleManagement from "../pages/admin/RoleManagement"
 import UserManagement from "../pages/admin/UserManagement"
 import GroupManagement from "../pages/admin/GroupManagement"
 import TeamManagement from "../pages/admin/TeamManagement"
+import Tempo from "../pages/project/Tempo"
 
 const PrivateRoute = () => {
 
@@ -40,6 +41,7 @@ const PrivateRoute = () => {
                                     <Route path=":projectId" element={<ProjectLayout />}>
                                         <Route path="board" element={<Board />} />
                                         <Route path="backlog" element={<Backlog />} />
+                                        <Route path="tempo" element={<Tempo />} />
                                     </Route>
                                 </Route>
                                 <Route path="admin">

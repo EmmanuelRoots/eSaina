@@ -53,6 +53,7 @@ export interface IssueDTO {
   projectStatus?: ProjectStatusDTO
   priority: IssuePriority
   storyPoints?: number | null
+  estimatedMinutes?: number | null
   position: number
   sprintId?: string | null
   assigneeId?: string | null
@@ -87,6 +88,7 @@ export interface UpdateIssueRequestDTO {
   statusId?: string
   priority?: IssuePriority
   storyPoints?: number | null
+  estimatedMinutes?: number | null
   position?: number
   sprintId?: string | null
   assigneeId?: string | null

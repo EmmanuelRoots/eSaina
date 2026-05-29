@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import { IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO, type IssueCommentDTO } from "../../data/dto/issue";
+import { IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO, type IssueCommentDTO } from "../../data/dto/issue";
+import type { UserDTO } from "../../data/dto/user";
 import { useProject } from "../../context/project/useProject";
 import issueApi from "../../services/api/issue.api";
+import projectApi from "../../services/api/project.api";
 import Row from "../row";
 import { Avatar } from "../avatar";
+import WorkLogList from "./WorkLogList";
+import { parseDuration, formatDuration } from "./WorkLogModal";
 
 interface IssueFormProps {
   initialData?: IssueDTO;
@@ -18,10 +22,21 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [type, setType] = useState<IssueType>(initialData?.type || IssueType.TASK);
-  const [status, setStatus] = useState<IssueStatus>(initialData?.status || IssueStatus.TODO);
+  // statusId fait référence à l'id du ProjectStatus (UUID) — source de vérité pour la colonne du board.
+  // On initialise avec le statusId de l'issue ou le premier statut du projet si c'est une création.
+  const [statusId, setStatusId] = useState<string | undefined>(
+    initialData?.statusId ?? currentProject?.statuses?.[0]?.id
+  );
   const [assigneeId, setAssigneeId] = useState<string | undefined>(initialData?.assigneeId || undefined);
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(propSprintId || initialData?.sprintId || null);
+  /** Membres assignables : membres de l'équipe rattachée au projet, ou membres directs si pas d'équipe. */
+  const [assignableMembers, setAssignableMembers] = useState<UserDTO[]>([]);
   
+  const [estimatedInput, setEstimatedInput] = useState(
+    initialData?.estimatedMinutes ? formatDuration(initialData.estimatedMinutes) : ""
+  );
+  const [estimatedError, setEstimatedError] = useState(false);
+
   const [comments, setComments] = useState<IssueCommentDTO[]>([]);
   const [newComment, setNewComment] = useState("");
 
@@ -31,15 +46,31 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
     }
   }, [initialData?.id]);
 
+  // Charge les membres assignables dès que le projectId est connu
+  useEffect(() => {
+    projectApi.getAssignableMembers(projectId)
+      .then(setAssignableMembers)
+      .catch(console.error);
+  }, [projectId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedEstimated = estimatedInput.trim() ? parseDuration(estimatedInput) : null;
+    if (estimatedInput.trim() && parsedEstimated === null) {
+      setEstimatedError(true);
+      return;
+    }
+    setEstimatedError(false);
     const payload: any = {
       title,
       description,
       type,
-      status,
-      assigneeId,
-      sprintId: selectedSprintId,
+      statusId,
+      // On omet les champs null/undefined pour ne pas déclencher la validation TSOA
+      // (noImplicitAdditionalProperties: throw-on-extras rejette null sur number? ou string?)
+      ...(assigneeId !== undefined && { assigneeId }),
+      ...(selectedSprintId !== null && { sprintId: selectedSprintId }),
+      ...(parsedEstimated !== null && { estimatedMinutes: parsedEstimated }),
     };
 
     if (!initialData) {
@@ -96,8 +127,10 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
           
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>État</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as IssueStatus)} style={selectStyle}>
-              {Object.values(IssueStatus).map(s => <option key={s} value={s}>{s}</option>)}
+            <select value={statusId || ""} onChange={(e) => setStatusId(e.target.value || undefined)} style={selectStyle}>
+              {currentProject?.statuses?.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
             </select>
           </div>
         </Row>
@@ -110,9 +143,9 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
             style={selectStyle}
           >
             <option value="">Non assigné</option>
-            {currentProject?.members?.map(m => (
-              <option key={m.userId} value={m.userId}>
-                {m.user?.firstName} {m.user?.lastName}
+            {assignableMembers.map(u => (
+              <option key={u.id} value={u.id}>
+                {u.firstName} {u.lastName}
               </option>
             ))}
           </select>
@@ -133,6 +166,32 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
             ))}
           </select>
         </div>
+
+        {/* Champ temps estimé (visible à la création et à l'édition) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={labelStyle}>Temps estimé</label>
+          <input
+            value={estimatedInput}
+            onChange={(e) => { setEstimatedInput(e.target.value); setEstimatedError(false); }}
+            placeholder="ex : 2h 30m, 45m, 90"
+            style={{ ...inputStyle, borderColor: estimatedError ? '#ef4444' : undefined }}
+          />
+          {estimatedError && (
+            <span style={{ fontSize: '11px', color: '#ef4444' }}>
+              Format invalide — utilisez : 2h 30m, 1h, 45m ou un nombre de minutes.
+            </span>
+          )}
+        </div>
+
+        {/* Section suivi du temps (seulement en mode édition) */}
+        {initialData?.id && (
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px' }}>
+            <WorkLogList
+              issueId={initialData.id}
+              estimatedMinutes={initialData.estimatedMinutes}
+            />
+          </div>
+        )}
 
         {initialData && (
           <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px', marginTop: '8px' }}>

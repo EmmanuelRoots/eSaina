@@ -38,6 +38,7 @@ export const urls = {
     GET_BACKLOG: (id: string) => `/project/${id}/backlog`,
     ADD_MEMBER: (id: string) => `/project/${id}/members`,
     REMOVE_MEMBER: (id: string, userId: string) => `/project/${id}/members/${userId}`,
+    GET_ASSIGNABLE_MEMBERS: (id: string) => `/project/${id}/assignable-members`,
     },
     projectStatus: {
       LIST: (projectId: string) => `/project/${projectId}/statuses`,
@@ -67,6 +68,16 @@ export const urls = {
     CREATE: `/label/create`,
     LIST: (projectId: string) => `/label/list?projectId=${projectId}`,
     DELETE: (id: string) => `/label/${id}`,
+    },
+    worklog: {
+    CREATE: `/worklog/create`,
+    LIST_BY_ISSUE: (issueId: string) => `/worklog/issue/${issueId}`,
+    LIST_BY_PROJECT: (projectId: string) => `/worklog/project/${projectId}`,
+    UPDATE: (id: string) => `/worklog/${id}`,
+    DELETE: (id: string) => `/worklog/${id}`,
+    },
+    analytics: {
+    PROJECT: (projectId: string) => `/analytics/project/${projectId}`,
     },
     role: {
     GET_ALL: `/roles`,
