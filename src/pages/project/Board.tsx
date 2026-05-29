@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import {
-  Search, Filter, Eye, Sparkles, Flag, Square, Plus, EyeOff,
+  Search, Filter, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check,
 } from "lucide-react"
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
@@ -52,7 +52,9 @@ const Board = () => {
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [modalData, setModalData] = useState<{ open: boolean; status?: IssueStatus; issue?: IssueDTO }>({ open: false })
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [showViewMenu, setShowViewMenu] = useState(false)
   const addMenuRef = useRef<HTMLDivElement>(null)
+  const viewMenuRef = useRef<HTMLDivElement>(null)
 
   const [visibleStatuses, setVisibleStatuses] = useState<IssueStatus[]>(() => {
     if (!projectId) return DEFAULT_VISIBLE
@@ -80,17 +82,34 @@ const Board = () => {
     persistColumns(visibleStatuses.filter((s) => s !== status))
   }
 
-  // Close add-column dropdown when clicking outside
+  const toggleColumn = (status: IssueStatus) => {
+    if (visibleStatuses.includes(status)) {
+      removeColumn(status)
+    } else {
+      persistColumns([...visibleStatuses, status])
+    }
+  }
+
+  const showAllColumns = () => {
+    persistColumns(ALL_COLUMNS.map(c => c.status))
+    setShowViewMenu(false)
+  }
+
+  // Close menus when clicking outside
   useEffect(() => {
-    if (!showAddMenu) return
+    if (!showAddMenu && !showViewMenu) return
     const handler = (e: MouseEvent) => {
-      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (showAddMenu && addMenuRef.current && !addMenuRef.current.contains(target)) {
         setShowAddMenu(false)
+      }
+      if (showViewMenu && viewMenuRef.current && !viewMenuRef.current.contains(target)) {
+        setShowViewMenu(false)
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [showAddMenu])
+  }, [showAddMenu, showViewMenu])
 
   useEffect(() => {
     if (projectId) {
@@ -195,7 +214,7 @@ const Board = () => {
       onDragStart={handleDragStart} onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveDragId(null)}
     >
-      <Column style={{ height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
+      <Column style={{ height: '100%', overflow: 'hidden' }}>
         {/* Sprint banner */}
         {activeSprint && (
           <div style={{
@@ -285,7 +304,74 @@ const Board = () => {
           <span style={{ flex: 1 }} />
 
           <button style={btnSecondaryStyle}><Filter size={14} />Filtres</button>
-          <button style={btnSecondaryStyle}><Eye size={14} />Vue</button>
+          
+          <div ref={viewMenuRef} style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setShowViewMenu(!showViewMenu)}
+              style={btnSecondaryStyle}
+            >
+              <Eye size={14} />Vue
+            </button>
+            {showViewMenu && (
+              <div style={{
+                position: 'absolute', top: 38, right: 0, zIndex: 60,
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 10, padding: 6,
+                minWidth: 220,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--color-text-tertiary)', padding: '4px 8px 8px' }}>
+                  Colonnes visibles
+                </div>
+                {ALL_COLUMNS.map((col) => {
+                  const isVisible = visibleStatuses.includes(col.status)
+                  return (
+                    <button
+                      key={col.status}
+                      onClick={() => toggleColumn(col.status)}
+                      style={{
+                        width: '100%', padding: '8px 10px', borderRadius: 7,
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        fontSize: 13, fontWeight: 500, color: 'var(--color-text)',
+                        background: 'transparent', textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface2)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                    >
+                      <div style={{ 
+                        width: 16, height: 16, borderRadius: 4, 
+                        border: '1.5px solid var(--color-border-strong)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: isVisible ? 'var(--color-primary)' : 'transparent',
+                        borderColor: isVisible ? 'var(--color-primary)' : 'var(--color-border-strong)',
+                      }}>
+                        {isVisible && <Check size={12} color="white" strokeWidth={3} />}
+                      </div>
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: col.accent, flexShrink: 0 }} />
+                      {col.label}
+                    </button>
+                  )
+                })}
+                <div style={{ height: 1, background: 'var(--color-border)', margin: '6px 4px' }} />
+                <button
+                  onClick={showAllColumns}
+                  style={{
+                    width: '100%', padding: '8px 10px', borderRadius: 7,
+                    fontSize: 12, fontWeight: 600, color: 'var(--color-primary)',
+                    background: 'transparent', textAlign: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-primary50)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                >
+                  Tout afficher
+                </button>
+              </div>
+            )}
+          </div>
+
           <button style={btnPrimaryStyle}><Sparkles size={14} />Insights IA</button>
         </div>
 
@@ -293,7 +379,7 @@ const Board = () => {
         <div style={{
           flex: 1, margin: '16px 24px 24px',
           overflowX: 'auto', overflowY: 'hidden',
-          display: 'flex', gap: 16, alignItems: 'flex-start',
+          display: 'flex', gap: 16, alignItems: 'stretch',
         }}>
           {visibleColumns.map((col) => {
             const issues = (boardIssues[col.status] ?? []).filter(matchesFilter)
