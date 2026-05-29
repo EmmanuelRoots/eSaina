@@ -10,6 +10,7 @@ import { getTimeBetweenTwoDate } from "../../../services/utils/date.utils"
 import { UseAuth } from "../../../context/user"
 import postApi from "../../../services/api/post.api"
 import Comments from "../comment"
+import { useThemeColors } from "../../../hooks/theme"
 
 
 type PostItemProps = HTMLAttributes<HTMLDivElement> & {
@@ -18,8 +19,8 @@ type PostItemProps = HTMLAttributes<HTMLDivElement> & {
 
 const PostItem = ({ post, ...rest }: PostItemProps) => {
   const { user } = UseAuth()
-  const { theme, colors } = useTheme()
-  const isDark = theme === 'dark'
+  const colors = useThemeColors()
+  const isDark = colors.mode === 'dark'
   const [reactions, setReactions] = useState<ReactionDTO[]>(post.reactions ?? [])
   const [myReaction, setMyReaction] = useState<ReactionDTO | undefined>(reactions.find(r => r.user?.id === user?.id) ?? undefined)
   const [showComments, setShowComments] = useState<boolean>(false)

@@ -11,7 +11,6 @@ type Props = {
 export const NavBar = (props: Props) => {
   const { logout, user } = UseAuth()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
