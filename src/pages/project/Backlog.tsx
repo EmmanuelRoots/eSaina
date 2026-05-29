@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import {
   Search, Plus, Play, Square, ChevronDown, ChevronRight, Flag, CalendarClock,
@@ -9,6 +9,7 @@ import {
   IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO
 } from "../../data/dto/issue"
 import { SprintStatus, type SprintDTO } from "../../data/dto/sprint"
+import { StatusCategory, type ProjectStatusDTO } from "../../data/dto/project"
 import Row from "../../components/row"
 import { Avatar } from "../../components/avatar"
 import { TypeIcon } from "../../components/issue/TypeIcon"
@@ -18,7 +19,7 @@ import { IssueLabel } from "../../components/issue/IssueLabel"
 import { Points } from "../../components/issue/Points"
 import { IssueForm } from "../../components/issue/IssueForm"
 
-const STATUS_LABEL: Record<IssueStatus, string> = {
+const DEFAULT_STATUS_LABEL: Record<string, string> = {
   [IssueStatus.TODO]: 'À faire',
   [IssueStatus.IN_PROGRESS]: 'En cours',
   [IssueStatus.IN_REVIEW]: 'En révision',
@@ -28,63 +29,81 @@ const STATUS_LABEL: Record<IssueStatus, string> = {
 
 const formatDate = (iso?: string | null) => iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : null
 
-const BacklogIssueRow = ({ issue, isLast, onClick }: { issue: IssueDTO; isLast: boolean; onClick?: () => void }) => (
-  <div
-    onClick={onClick}
-    style={{
-      padding: '8px 16px',
-      display: 'flex', alignItems: 'center', gap: 12,
-      borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
-      transition: 'background 100ms cubic-bezier(.4,0,.2,1)',
-      cursor: 'pointer',
-    }}
-    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-surface2)'}
-    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-  >
-    <GripVertical size={14} color="var(--color-text-tertiary)" />
-    <TypeIcon type={issue.type} size={12} />
-    <span style={{
-      fontSize: 12, fontFamily: 'var(--font-mono)',
-      color: 'var(--color-text-tertiary)', fontWeight: 500, minWidth: 70,
-    }}>{issue.key}</span>
-    <span style={{
-      fontSize: 13, color: 'var(--color-text)', fontWeight: 500, flex: 1,
-      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-    }}>{issue.title}</span>
-    <Row style={{ gap: 4 }}>
-      {(issue.labels ?? []).slice(0, 2).map((l) => <IssueLabel key={l.id} label={l} />)}
-    </Row>
-    <PriorityIcon priority={issue.priority} size={14} />
-    <span style={{
-      fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4,
-      background: 'var(--color-surface2)',
-      border: '1px solid var(--color-border)',
-      color: 'var(--color-text-secondary)',
-      minWidth: 80, textAlign: 'center',
-    }}>{STATUS_LABEL[issue.status]}</span>
-    {issue.storyPoints != null && <Points value={issue.storyPoints} />}
-    <div style={{ width: 32, display: 'flex', justifyContent: 'flex-end' }}>
-      {issue.assignee ? <Avatar user={issue.assignee} size={24} /> : (
-        <div style={{
-          width: 24, height: 24, borderRadius: '50%',
-          border: '1.5px dashed var(--color-border-strong)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'var(--color-text-tertiary)',
-        }}>
-          <User size={12} />
-        </div>
-      )}
+const BacklogIssueRow = ({ 
+  issue, 
+  isLast, 
+  onClick,
+  projectStatuses 
+}: { 
+  issue: IssueDTO; 
+  isLast: boolean; 
+  onClick?: () => void;
+  projectStatuses?: ProjectStatusDTO[];
+}) => {
+  const status = projectStatuses?.find(s => s.id === issue.statusId) || 
+                 projectStatuses?.find(s => s.name === issue.status);
+  
+  const label = status?.name || DEFAULT_STATUS_LABEL[issue.status] || issue.status;
+  const color = status?.color || 'var(--color-text-secondary)';
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        padding: '8px 16px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
+        transition: 'background 100ms cubic-bezier(.4,0,.2,1)',
+        cursor: 'pointer',
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-surface2)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+    >
+      <GripVertical size={14} color="var(--color-text-tertiary)" />
+      <TypeIcon type={issue.type} size={12} />
+      <span style={{
+        fontSize: 12, fontFamily: 'var(--font-mono)',
+        color: 'var(--color-text-tertiary)', fontWeight: 500, minWidth: 70,
+      }}>{issue.key}</span>
+      <span style={{
+        fontSize: 13, color: 'var(--color-text)', fontWeight: 500, flex: 1,
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>{issue.title}</span>
+      <Row style={{ gap: 4 }}>
+        {(issue.labels ?? []).slice(0, 2).map((l) => <IssueLabel key={l.id} label={l} />)}
+      </Row>
+      <PriorityIcon priority={issue.priority} size={14} />
+      <span style={{
+        fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 4,
+        background: `${color}15`,
+        border: `1px solid ${color}40`,
+        color: color,
+        minWidth: 80, textAlign: 'center',
+      }}>{label}</span>
+      {issue.storyPoints != null && <Points value={issue.storyPoints} />}
+      <div style={{ width: 32, display: 'flex', justifyContent: 'flex-end' }}>
+        {issue.assignee ? <Avatar user={issue.assignee} size={24} /> : (
+          <div style={{
+            width: 24, height: 24, borderRadius: '50%',
+            border: '1.5px dashed var(--color-border-strong)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--color-text-tertiary)',
+          }}>
+            <User size={12} />
+          </div>
+        )}
+      </div>
+      <button style={{ color: 'var(--color-text-tertiary)', padding: 4 }}>
+        <MoreHorizontal size={14} />
+      </button>
     </div>
-    <button style={{ color: 'var(--color-text-tertiary)', padding: 4 }}>
-      <MoreHorizontal size={14} />
-    </button>
-  </div>
-)
+  )
+}
 
 type SprintWithIssues = SprintDTO & { issues: IssueDTO[] }
 
 const SprintSection = ({
-  sprint, issues, defaultOpen, onCreateIssue, onStart, onClose, onEditIssue,
+  sprint, issues, defaultOpen, onCreateIssue, onStart, onClose, onEditIssue, projectStatuses
 }: { 
   sprint: SprintWithIssues; 
   issues: IssueDTO[]; 
@@ -93,13 +112,39 @@ const SprintSection = ({
   onStart: () => void;
   onClose: () => void;
   onEditIssue: (issue: IssueDTO) => void;
+  projectStatuses?: ProjectStatusDTO[];
 }) => {
   const [open, setOpen] = useState(defaultOpen)
-  const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
-  const donePoints = issues.filter((i) => i.status === IssueStatus.DONE).reduce((s, i) => s + (i.storyPoints ?? 0), 0)
-  const inProgress = issues.filter((i) => i.status === IssueStatus.IN_PROGRESS || i.status === IssueStatus.IN_REVIEW).length
-  const todo = issues.filter((i) => i.status === IssueStatus.TODO).length
-  const done = issues.filter((i) => i.status === IssueStatus.DONE).length
+  
+  const stats = useMemo(() => {
+    let todo = 0;
+    let inProgress = 0;
+    let done = 0;
+    let totalPts = 0;
+    let donePts = 0;
+
+    issues.forEach(i => {
+      totalPts += (i.storyPoints ?? 0);
+      const s = projectStatuses?.find(st => st.id === i.statusId) || 
+                projectStatuses?.find(st => st.name === i.status);
+      
+      const category = s?.category || 
+        (i.status === IssueStatus.DONE ? StatusCategory.DONE : 
+         (i.status === IssueStatus.TODO ? StatusCategory.TODO : StatusCategory.IN_PROGRESS));
+
+      if (category === StatusCategory.DONE) {
+        done++;
+        donePts += (i.storyPoints ?? 0);
+      } else if (category === StatusCategory.TODO) {
+        todo++;
+      } else {
+        inProgress++;
+      }
+    });
+
+    return { todo, inProgress, done, totalPts, donePts };
+  }, [issues, projectStatuses]);
+
   const isActive = sprint.status === SprintStatus.ACTIVE
   const n = issues.length || 1
 
@@ -150,14 +195,14 @@ const SprintSection = ({
         {issues.length > 0 && (
           <Row style={{ alignItems: 'center', gap: 8 }}>
             <div style={{ display: 'flex', height: 8, width: 200, borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface2)' }}>
-              <div style={{ width: `${(todo / n) * 100}%`, background: '#cbd5e1' }} title={`${todo} à faire`} />
-              <div style={{ width: `${(inProgress / n) * 100}%`, background: 'var(--color-secondary)' }} title={`${inProgress} en cours`} />
-              <div style={{ width: `${(done / n) * 100}%`, background: 'var(--color-primary)' }} title={`${done} terminés`} />
+              <div style={{ width: `${(stats.todo / n) * 100}%`, background: '#cbd5e1' }} title={`${stats.todo} à faire`} />
+              <div style={{ width: `${(stats.inProgress / n) * 100}%`, background: 'var(--color-secondary)' }} title={`${stats.inProgress} en cours`} />
+              <div style={{ width: `${(stats.done / n) * 100}%`, background: 'var(--color-primary)' }} title={`${stats.done} terminés`} />
             </div>
             <Row style={{ gap: 6, fontSize: 11, fontWeight: 700 }}>
-              <SwatchCount color="#cbd5e1" n={todo} />
-              <SwatchCount color="var(--color-secondary)" n={inProgress} />
-              <SwatchCount color="var(--color-primary)" n={done} />
+              <SwatchCount color="#cbd5e1" n={stats.todo} />
+              <SwatchCount color="var(--color-secondary)" n={stats.inProgress} />
+              <SwatchCount color="var(--color-primary)" n={stats.done} />
             </Row>
           </Row>
         )}
@@ -168,7 +213,7 @@ const SprintSection = ({
           fontSize: 12, fontWeight: 700, color: 'var(--color-text)',
           minWidth: 70, textAlign: 'center',
         }}>
-          {donePoints}<span style={{ color: 'var(--color-text-tertiary)' }}> / {totalPoints} pts</span>
+          {stats.donePts}<span style={{ color: 'var(--color-text-tertiary)' }}> / {stats.totalPts} pts</span>
         </div>
 
         {isActive ? (
@@ -196,6 +241,7 @@ const SprintSection = ({
               issue={issue} 
               isLast={i === issues.length - 1} 
               onClick={() => onEditIssue(issue)}
+              projectStatuses={projectStatuses}
             />
           ))}
           {issues.length === 0 && (
@@ -231,12 +277,14 @@ const BacklogPanel = ({
   onCreateIssue, 
   onCreateSprint,
   onEditIssue,
+  projectStatuses,
 }: { 
   issues: IssueDTO[]; 
   defaultOpen: boolean; 
   onCreateIssue: () => void;
   onCreateSprint: () => void;
   onEditIssue: (issue: IssueDTO) => void;
+  projectStatuses?: ProjectStatusDTO[];
 }) => {
   const [open, setOpen] = useState(defaultOpen)
   const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
@@ -274,6 +322,7 @@ const BacklogPanel = ({
               issue={issue} 
               isLast={i === issues.length - 1} 
               onClick={() => onEditIssue(issue)}
+              projectStatuses={projectStatuses}
             />
           ))}
           {issues.length === 0 && (
@@ -300,7 +349,7 @@ const BacklogPanel = ({
 const Backlog = () => {
   const { projectId } = useParams<{ projectId: string }>()
   const { 
-    backlogIssues, sprints, fetchBacklog, fetchProjectData, 
+    backlogIssues, sprints, fetchBacklog, fetchProjectData, currentProject,
     createIssue, updateIssue, createSprint, startSprint, closeSprint 
   } = useProject()
   const [searchQ, setSearchQ] = useState('')
@@ -410,6 +459,7 @@ const Backlog = () => {
             onStart={() => sprint.id && startSprint(sprint.id)}
             onClose={() => sprint.id && closeSprint(sprint.id)}
             onEditIssue={(issue) => setModalData({ open: true, issue })}
+            projectStatuses={currentProject?.statuses}
           />
         ))}
         <BacklogPanel 
@@ -418,6 +468,7 @@ const Backlog = () => {
           onCreateIssue={() => setModalData({ open: true })} 
           onCreateSprint={handleCreateSprint}
           onEditIssue={(issue) => setModalData({ open: true, issue })}
+          projectStatuses={currentProject?.statuses}
         />
       </div>
 

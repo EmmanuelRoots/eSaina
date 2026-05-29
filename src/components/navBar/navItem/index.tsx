@@ -18,9 +18,9 @@ export const NavItem = ({ name, path, type, logo, style }: Props) => {
   } as CSSProperties
 
   const defaultStyle = {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     '--hover-color': colors.primary,
-    '--text-color': colors.secondaryText,
+    '--text-color': colors.textSecondary,
   } as CSSProperties
 
   switch (type) {

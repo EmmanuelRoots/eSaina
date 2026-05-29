@@ -39,6 +39,13 @@ export const urls = {
     ADD_MEMBER: (id: string) => `/project/${id}/members`,
     REMOVE_MEMBER: (id: string, userId: string) => `/project/${id}/members/${userId}`,
     },
+    projectStatus: {
+      LIST: (projectId: string) => `/project/${projectId}/statuses`,
+      CREATE: (projectId: string) => `/project/${projectId}/statuses`,
+      UPDATE: (statusId: string) => `/project/statuses/${statusId}`,
+      DELETE: (statusId: string) => `/project/statuses/${statusId}`,
+      REORDER: (projectId: string) => `/project/${projectId}/statuses/reorder`,
+    },
     sprint: {
     CREATE: `/sprint/create`,
     LIST: (projectId: string) => `/sprint/list?projectId=${projectId}`,

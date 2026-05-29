@@ -1,9 +1,8 @@
 import { useState, type JSX } from "react";
-import type { ProjectDTO } from "../../data/dto/project";
+import type { ProjectDTO, ProjectStatusDTO } from "../../data/dto/project";
 import {
   type CreateIssueRequestDTO,
   type IssueDTO,
-  IssueStatus,
   type UpdateIssueRequestDTO,
 } from "../../data/dto/issue";
 import type { SprintDTO } from "../../data/dto/sprint";
@@ -55,12 +54,12 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
   const createIssue = async (payload: CreateIssueRequestDTO): Promise<IssueDTO | null> => {
     try {
       const issue = await issueApi.createIssue(payload);
-      // Add to the appropriate board column (new issues start in TODO).
+      // Add to the appropriate board column
       setBoardIssues((prev) => {
-        const status = issue.status ?? IssueStatus.TODO;
-        const column = prev[status] ? [...prev[status]] : [];
+        const statusKey = issue.statusId || issue.status;
+        const column = prev[statusKey] ? [...prev[statusKey]] : [];
         column.push(issue);
-        return { ...prev, [status]: column };
+        return { ...prev, [statusKey]: column };
       });
       if (!payload.sprintId) {
         setBacklogIssues((prev) => [issue, ...prev]);
@@ -157,8 +156,8 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
 
   const moveIssue = async (
     issueId: string,
-    fromStatus: IssueStatus,
-    toStatus: IssueStatus,
+    fromStatus: string,
+    toStatus: string,
     toIndex: number,
   ): Promise<void> => {
     // Snapshot for rollback.
@@ -173,17 +172,92 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
       const toCol =
         fromStatus === toStatus ? fromCol : [...(prev[toStatus] ?? [])];
       const safeIdx = Math.max(0, Math.min(toIndex, toCol.length));
-      toCol.splice(safeIdx, 0, { ...moving, status: toStatus });
+      
+      const updatedMoving = { ...moving };
+      if (toStatus.length > 20) { // Assume UUID for statusId
+        updatedMoving.statusId = toStatus;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        updatedMoving.status = toStatus as any;
+      }
+      
+      toCol.splice(safeIdx, 0, updatedMoving);
       next[toStatus] = toCol;
       return next;
     });
     try {
       const payload: UpdateIssueRequestDTO = { position: toIndex };
-      if (fromStatus !== toStatus) payload.status = toStatus;
+      if (fromStatus !== toStatus) {
+        if (toStatus.length > 20) {
+          payload.statusId = toStatus;
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          payload.status = toStatus as any;
+        }
+      }
       await issueApi.updateIssue(issueId, payload);
     } catch (error) {
       console.error("Error moving issue, rolling back", error);
       if (snapshot) setBoardIssues(snapshot);
+    }
+  };
+
+  const createStatus = async (projectId: string, payload: Partial<ProjectStatusDTO>): Promise<ProjectStatusDTO | null> => {
+    try {
+      const status = await projectApi.createProjectStatus(projectId, payload);
+      setCurrentProject(prev => prev ? { ...prev, statuses: [...(prev.statuses || []), status].sort((a, b) => (a.position || 0) - (b.position || 0)) } : null);
+      return status;
+    } catch (error) {
+      console.error("Error creating status", error);
+      return null;
+    }
+  };
+
+  const updateStatus = async (statusId: string, payload: Partial<ProjectStatusDTO>): Promise<ProjectStatusDTO | null> => {
+    try {
+      const status = await projectApi.updateProjectStatus(statusId, payload);
+      setCurrentProject(prev => prev ? { ...prev, statuses: (prev.statuses || []).map(s => s.id === statusId ? status : s).sort((a, b) => (a.position || 0) - (b.position || 0)) } : null);
+      return status;
+    } catch (error) {
+      console.error("Error updating status", error);
+      return null;
+    }
+  };
+
+  const deleteStatus = async (statusId: string): Promise<void> => {
+    try {
+      await projectApi.deleteProjectStatus(statusId);
+      setCurrentProject(prev => prev ? { ...prev, statuses: (prev.statuses || []).filter(s => s.id !== statusId) } : null);
+    } catch (error) {
+      console.error("Error deleting status", error);
+    }
+  };
+
+  const reorderStatuses = async (projectId: string, statusIds: string[]): Promise<void> => {
+    // Snapshot pour rollback en cas d'échec
+    let previousStatuses: ProjectStatusDTO[] | undefined;
+
+    // Mise à jour optimiste : réordonne currentProject.statuses immédiatement
+    // pour que le board reflète le nouvel ordre sans attendre l'API.
+    setCurrentProject((prev) => {
+      if (!prev?.statuses) return prev;
+      previousStatuses = prev.statuses;
+      const sorted = statusIds
+        .map((id) => prev.statuses!.find((s) => s.id === id))
+        .filter(Boolean) as ProjectStatusDTO[];
+      return { ...prev, statuses: sorted };
+    });
+
+    try {
+      await projectApi.reorderProjectStatuses(projectId, statusIds);
+      // Pas de fetchProjectData ici : le backend peut retourner les statuts dans
+      // leur ordre d'insertion (non trié par position), ce qui écraserait la
+      // mise à jour optimiste et ferait revenir les colonnes en arrière.
+    } catch (error) {
+      console.error("Error reordering statuses", error);
+      if (previousStatuses) {
+        setCurrentProject((prev) => prev ? { ...prev, statuses: previousStatuses! } : null);
+      }
     }
   };
 
@@ -204,6 +278,10 @@ export const ProjectProvider = ({ children }: { children: JSX.Element | JSX.Elem
         closeSprint,
         updateIssue,
         moveIssue,
+        createStatus,
+        updateStatus,
+        deleteStatus,
+        reorderStatuses,
       }}
     >
       {children}

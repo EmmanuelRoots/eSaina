@@ -85,9 +85,9 @@ export const CommentNode = ({node, depth}:CommentNodeProps)=>{
           </Column>
           <Row style={{padding:'0.5rem', justifyContent:'space-between', alignItems: 'center'}}>
             <Row gap={12}>
-              <button style={styles.commentAction} onClick={handleLiked}><Text color={liked ? 'likedText' : 'secondaryText'} variant="body2" style={{fontWeight:600}}>J'aime</Text></button>
-              <button style={styles.commentAction}><Text color="secondaryText" variant="body2" style={{fontWeight:600}} onClick={()=>setShowRep(prev=>!prev)}>Répondre</Text></button>
-              <Text variant="body2" color="secondaryText">{getTimeBetweenTwoDate(node.createdAt)}</Text>
+              <button style={styles.commentAction} onClick={handleLiked}><Text color={liked ? "primary" : "textSecondary"} variant="body2" style={{fontWeight:600}}>J'aime</Text></button>
+              <button style={styles.commentAction}><Text color="textSecondary" variant="body2" style={{fontWeight:600}} onClick={()=>setShowRep(prev=>!prev)}>Répondre</Text></button>
+              <Text variant="body2" color="textSecondary">{getTimeBetweenTwoDate(node.createdAt)}</Text>
             </Row>
             <Row gap={8} style={{alignItems:'center'}}>
               <Text variant="body2">{replies.length && replies.length >1 ? `${replies.length} réponses` : `${replies.length} réponse`}</Text>

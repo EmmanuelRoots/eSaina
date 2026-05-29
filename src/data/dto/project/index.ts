@@ -6,6 +6,21 @@ export enum ProjectMemberRole {
   VIEWER = 'VIEWER',
 }
 
+export enum StatusCategory {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+
+export interface ProjectStatusDTO {
+  id: string
+  name: string
+  color: string
+  category: StatusCategory
+  position: number
+  projectId: string
+}
+
 export interface ProjectMemberDTO {
   id?: string
   projectId: string
@@ -31,6 +46,7 @@ export interface ProjectDTO {
   salonId?: string | null
   issueCounter?: number
   members?: ProjectMemberDTO[]
+  statuses?: ProjectStatusDTO[]
   createdAt?: string
   updatedAt?: string
 }

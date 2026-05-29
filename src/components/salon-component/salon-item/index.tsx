@@ -1,6 +1,6 @@
 import { useState, type HTMLAttributes } from "react"
 import type { SalonDTO } from "../../../data/dto/post"
-import { useTheme } from "../../../hooks/theme"
+
 import { Hash, TrendingUp } from "lucide-react"
 
 type SalonItemProps = HTMLAttributes<HTMLDivElement> & {
@@ -77,7 +77,7 @@ export const SalonItem = ({ salon, ...rest }: SalonItemProps) => {
             <span
               style={{
                 fontSize: '0.75rem',
-                color: colors.secondaryText,
+                color: colors.textSecondary,
                 fontWeight: 400
               }}
             >

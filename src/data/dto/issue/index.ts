@@ -1,3 +1,4 @@
+import type { ProjectStatusDTO } from "../project"
 import type { UserDTO } from "../user"
 
 export enum IssueType {
@@ -48,6 +49,8 @@ export interface IssueDTO {
   description?: string | null
   type: IssueType
   status: IssueStatus
+  statusId?: string
+  projectStatus?: ProjectStatusDTO
   priority: IssuePriority
   storyPoints?: number | null
   position: number
@@ -67,6 +70,7 @@ export interface CreateIssueRequestDTO {
   title: string
   description?: string
   type?: IssueType
+  statusId?: string
   priority?: IssuePriority
   storyPoints?: number
   sprintId?: string
@@ -80,6 +84,7 @@ export interface UpdateIssueRequestDTO {
   description?: string | null
   type?: IssueType
   status?: IssueStatus
+  statusId?: string
   priority?: IssuePriority
   storyPoints?: number | null
   position?: number

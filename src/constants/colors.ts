@@ -21,6 +21,9 @@ export const Colors = {
     warning: '#f59e0b',
     info: '#3b82f6',
     purple: '#8b5cf6',
+
+    primaryBackground: '#ffffff',
+    default: '#0f172a',
   },
   dark: {
     primary: '#10b981',
@@ -44,5 +47,8 @@ export const Colors = {
     warning: '#fbbf24',
     info: '#60a5fa',
     purple: '#a78bfa',
+
+    primaryBackground: '#131a2b',
+    default: '#f1f5f9',
   },
 } as const

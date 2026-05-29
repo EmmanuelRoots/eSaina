@@ -87,11 +87,11 @@ const CreateConversationModal = ({open, oncClose, onFinished}:CreateConvModalPro
       title : conv.title,
       type : ConversationType.DIRECT,
       members : [{
-          userId : conv.userId.id,
+          user : { id: conv.userId.id },
           role : MemberRole.MEMBER
         },
         {
-          userId : user?.id,
+          user : { id: user?.id },
           role : MemberRole.ADMIN
         }
       ]

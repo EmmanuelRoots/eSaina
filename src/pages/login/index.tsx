@@ -33,7 +33,7 @@ const LoginPage = () => {
 
   const onGoogleSuccess = async (res: CredentialResponse) => {
     const googleUser = jwtDecode(res.credential || '') as GoogleLoginDTO
-    await login(googleUser).catch(() => { /* alert already shown in login */ })
+    await login(googleUser)
   }
 
   return (

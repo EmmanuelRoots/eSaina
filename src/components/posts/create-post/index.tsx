@@ -3,7 +3,7 @@ import { UseAuth } from "../../../context/user"
 import { Card, CardBody } from "../../card"
 import Row from "../../row"
 import { CreatePostModal } from "./create-post-modal"
-import { useTheme } from "../../../hooks/theme"
+
 import { Edit3 } from "lucide-react"
 
 export const CreatePost = () => {
@@ -57,7 +57,7 @@ export const CreatePost = () => {
                 borderRadius: '24px',
                 padding: '14px 20px',
                 textAlign: 'left',
-                color: colors.secondaryText,
+                color: colors.textSecondary,
                 fontSize: '0.95rem',
                 cursor: 'pointer',
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -76,7 +76,7 @@ export const CreatePost = () => {
             >
               <Edit3
                 size={18}
-                color={isHovered ? colors.secondary : colors.secondaryText}
+                color={isHovered ? colors.secondary : colors.textSecondary}
                 style={{ transition: 'color 0.25s ease' }}
               />
               <span>Quoi de neuf, {user?.firstName}?</span>

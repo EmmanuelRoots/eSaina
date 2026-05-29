@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import {
-  Search, Filter, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check,
+  Search, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check, Settings2,
 } from "lucide-react"
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
@@ -13,30 +13,16 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useProject } from "../../context/project/useProject"
-import { IssueStatus, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
+import { type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
 import { SprintStatus } from "../../data/dto/sprint"
 import Column from "../../components/column"
 import Row from "../../components/row"
 import { Avatar } from "../../components/avatar"
 import { IssueCard } from "../../components/issue/IssueCard"
 import { IssueForm } from "../../components/issue/IssueForm"
+import { StatusManagementModal } from "../../components/project/StatusManagementModal"
 
-const ALL_COLUMNS: Array<{ status: IssueStatus; label: string; accent: string }> = [
-  { status: IssueStatus.TODO,        label: 'À faire',     accent: '#94a3b8' },
-  { status: IssueStatus.IN_PROGRESS, label: 'En cours',    accent: '#3b82f6' },
-  { status: IssueStatus.IN_REVIEW,   label: 'En révision', accent: '#f59e0b' },
-  { status: IssueStatus.DONE,        label: 'Terminé',     accent: '#10b981' },
-  { status: IssueStatus.CANCELLED,   label: 'Annulé',      accent: '#ef4444' },
-]
-
-const DEFAULT_VISIBLE: IssueStatus[] = [
-  IssueStatus.TODO,
-  IssueStatus.IN_PROGRESS,
-  IssueStatus.IN_REVIEW,
-  IssueStatus.DONE,
-]
-
-const storageKey = (projectId: string) => `board-columns-${projectId}`
+const storageKey = (projectId: string) => `board-columns-v2-${projectId}`
 
 const daysBetween = (a: string, b: string) =>
   Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000))
@@ -50,48 +36,73 @@ const Board = () => {
   const [searchQ, setSearchQ] = useState('')
   const [activeAssignee, setActiveAssignee] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
-  const [modalData, setModalData] = useState<{ open: boolean; status?: IssueStatus; issue?: IssueDTO }>({ open: false })
+  const [modalData, setModalData] = useState<{ open: boolean; statusId?: string; issue?: IssueDTO }>({ open: false })
   const [showAddMenu, setShowAddMenu] = useState(false)
   const [showViewMenu, setShowViewMenu] = useState(false)
+  const [showStatusModal, setShowStatusModal] = useState(false)
   const addMenuRef = useRef<HTMLDivElement>(null)
   const viewMenuRef = useRef<HTMLDivElement>(null)
 
-  const [visibleStatuses, setVisibleStatuses] = useState<IssueStatus[]>(() => {
-    if (!projectId) return DEFAULT_VISIBLE
-    try {
-      const stored = localStorage.getItem(storageKey(projectId))
-      if (stored) return JSON.parse(stored) as IssueStatus[]
-    } catch {}
-    return DEFAULT_VISIBLE
-  })
+  const [visibleStatusIds, setVisibleStatusIds] = useState<string[]>([])
 
-  const visibleColumns = ALL_COLUMNS.filter((c) => visibleStatuses.includes(c.status))
-  const hiddenColumns = ALL_COLUMNS.filter((c) => !visibleStatuses.includes(c.status))
+  useEffect(() => {
+    if (currentProject?.statuses) {
+      try {
+        const stored = localStorage.getItem(storageKey(currentProject.id))
+        if (stored) {
+          const ids = JSON.parse(stored) as string[]
+          // Filter to only include IDs that still exist
+          const validIds = ids.filter(id => currentProject.statuses?.some(s => s.id === id))
+          setVisibleStatusIds(validIds.length > 0 ? validIds : currentProject.statuses.map(s => s.id))
+        } else {
+          setVisibleStatusIds(currentProject.statuses.map(s => s.id))
+        }
+      } catch {
+        setVisibleStatusIds(currentProject.statuses.map(s => s.id))
+      }
+    }
+  }, [currentProject?.statuses, currentProject?.id])
 
-  const persistColumns = (next: IssueStatus[]) => {
+  const allColumns = useMemo(() => {
+    if (!currentProject?.statuses) return []
+    return currentProject.statuses.map(s => ({
+      statusId: s.id,
+      label: s.name,
+      accent: s.color
+    }))
+  }, [currentProject?.statuses])
+
+  // L'ordre suit visibleStatusIds (localStorage), pas allColumns (serveur) —
+  // sinon un drag dans le modal serait écrasé par la réponse API.
+  const visibleColumns = visibleStatusIds
+    .map((id) => allColumns.find((c) => c.statusId === id))
+    .filter((c): c is NonNullable<typeof c> => c !== undefined)
+  const hiddenColumns = allColumns.filter((c) => !visibleStatusIds.includes(c.statusId))
+
+  const persistColumns = (next: string[]) => {
     if (projectId) localStorage.setItem(storageKey(projectId), JSON.stringify(next))
-    setVisibleStatuses(next)
+    setVisibleStatusIds(next)
   }
 
-  const addColumn = (status: IssueStatus) => {
-    persistColumns([...visibleStatuses, status])
+  const addColumn = (statusId: string) => {
+    persistColumns([...visibleStatusIds, statusId])
     setShowAddMenu(false)
   }
 
-  const removeColumn = (status: IssueStatus) => {
-    persistColumns(visibleStatuses.filter((s) => s !== status))
+  const removeColumn = (statusId: string) => {
+    persistColumns(visibleStatusIds.filter((id) => id !== statusId))
   }
 
-  const toggleColumn = (status: IssueStatus) => {
-    if (visibleStatuses.includes(status)) {
-      removeColumn(status)
+  const toggleColumn = (statusId: string) => {
+    if (visibleStatusIds.includes(statusId)) {
+      removeColumn(statusId)
     } else {
-      persistColumns([...visibleStatuses, status])
+      persistColumns([...visibleStatusIds, statusId])
     }
   }
 
   const showAllColumns = () => {
-    persistColumns(ALL_COLUMNS.map(c => c.status))
+    persistColumns(allColumns.map(c => c.statusId))
     setShowViewMenu(false)
   }
 
@@ -150,10 +161,10 @@ const Board = () => {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   // Search all loaded board issues, not just visible columns
-  const findIssueById = (id: string): { issue: IssueDTO; status: IssueStatus; index: number } | null => {
-    for (const [status, list] of Object.entries(boardIssues)) {
+  const findIssueById = (id: string): { issue: IssueDTO; statusKey: string; index: number } | null => {
+    for (const [statusKey, list] of Object.entries(boardIssues)) {
       const idx = list.findIndex((i) => i.id === id)
-      if (idx !== -1) return { issue: list[idx], status: status as IssueStatus, index: idx }
+      if (idx !== -1) return { issue: list[idx], statusKey, index: idx }
     }
     return null
   }
@@ -172,26 +183,26 @@ const Board = () => {
     if (!sourceInfo) return
 
     const overId = String(over.id)
-    let toStatus: IssueStatus | null = null
+    let toStatusKey: string | null = null
     let toIndex = 0
 
     if (overId.startsWith('col:')) {
-      toStatus = overId.slice(4) as IssueStatus
-      toIndex = (boardIssues[toStatus] ?? []).length
+      toStatusKey = overId.slice(4)
+      toIndex = (boardIssues[toStatusKey] ?? []).length
     } else {
       const overInfo = findIssueById(overId)
       if (!overInfo) return
-      toStatus = overInfo.status
+      toStatusKey = overInfo.statusKey
       toIndex = overInfo.index
-      if (sourceInfo.status === toStatus && sourceInfo.index < toIndex) {
+      if (sourceInfo.statusKey === toStatusKey && sourceInfo.index < toIndex) {
         toIndex -= 1
       }
     }
 
-    if (!toStatus) return
-    if (toStatus === sourceInfo.status && toIndex === sourceInfo.index) return
+    if (!toStatusKey) return
+    if (toStatusKey === sourceInfo.statusKey && toIndex === sourceInfo.index) return
 
-    moveIssue(sourceInfo.issue.id, sourceInfo.status, toStatus, toIndex)
+    moveIssue(sourceInfo.issue.id, sourceInfo.statusKey, toStatusKey, toIndex)
   }
 
   const handleCreateOrUpdate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
@@ -201,15 +212,15 @@ const Board = () => {
       await createIssue({
         ...(data as CreateIssueRequestDTO),
         sprintId: activeSprint?.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        status: modalData.status,
-      } as any)
+        statusId: modalData.statusId,
+      })
     }
     if (projectId) fetchBoard(projectId)
     setModalData({ open: false })
   }
 
   return (
+    <>
     <DndContext sensors={sensors} collisionDetection={closestCorners}
       onDragStart={handleDragStart} onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveDragId(null)}
@@ -303,7 +314,9 @@ const Board = () => {
 
           <span style={{ flex: 1 }} />
 
-          <button style={btnSecondaryStyle}><Filter size={14} />Filtres</button>
+          <button style={btnSecondaryStyle} onClick={() => setShowStatusModal(true)}>
+            <Settings2 size={14} /> Colonnes
+          </button>
           
           <div ref={viewMenuRef} style={{ position: 'relative' }}>
             <button 
@@ -324,12 +337,12 @@ const Board = () => {
                 <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--color-text-tertiary)', padding: '4px 8px 8px' }}>
                   Colonnes visibles
                 </div>
-                {ALL_COLUMNS.map((col) => {
-                  const isVisible = visibleStatuses.includes(col.status)
+                {allColumns.map((col) => {
+                  const isVisible = visibleStatusIds.includes(col.statusId)
                   return (
                     <button
-                      key={col.status}
-                      onClick={() => toggleColumn(col.status)}
+                      key={col.statusId}
+                      onClick={() => toggleColumn(col.statusId)}
                       style={{
                         width: '100%', padding: '8px 10px', borderRadius: 7,
                         display: 'flex', alignItems: 'center', gap: 10,
@@ -382,17 +395,17 @@ const Board = () => {
           display: 'flex', gap: 16, alignItems: 'stretch',
         }}>
           {visibleColumns.map((col) => {
-            const issues = (boardIssues[col.status] ?? []).filter(matchesFilter)
+            const issues = (boardIssues[col.statusId] ?? []).filter(matchesFilter)
             return (
               <BoardColumn
-                key={col.status}
-                status={col.status}
+                key={col.statusId}
+                statusId={col.statusId}
                 label={col.label}
                 accent={col.accent}
                 issues={issues}
-                onAskCreate={() => setModalData({ open: true, status: col.status })}
-                onEditIssue={(issue) => setModalData({ open: true, issue, status: col.status })}
-                onRemove={() => removeColumn(col.status)}
+                onAskCreate={() => setModalData({ open: true, statusId: col.statusId })}
+                onEditIssue={(issue) => setModalData({ open: true, issue, statusId: col.statusId })}
+                onRemove={() => removeColumn(col.statusId)}
               />
             )
           })}
@@ -430,8 +443,8 @@ const Board = () => {
                   </div>
                   {hiddenColumns.map((col) => (
                     <button
-                      key={col.status}
-                      onClick={() => addColumn(col.status)}
+                      key={col.statusId}
+                      onClick={() => addColumn(col.statusId)}
                       style={{
                         width: '100%', padding: '8px 10px', borderRadius: 7,
                         display: 'flex', alignItems: 'center', gap: 10,
@@ -450,7 +463,7 @@ const Board = () => {
                         background: 'var(--color-surface2)', border: '1px solid var(--color-border)',
                         padding: '1px 6px', borderRadius: 8,
                       }}>
-                        {(boardIssues[col.status] ?? []).length}
+                        {(boardIssues[col.statusId] ?? []).length}
                       </span>
                     </button>
                   ))}
@@ -482,11 +495,25 @@ const Board = () => {
         {activeIssue ? <IssueCard issue={activeIssue} style={{ cursor: 'grabbing' }} /> : null}
       </DragOverlay>
     </DndContext>
+
+    {/* Hors du DndContext du board pour éviter que le drag du modal
+        soit intercepté par le handleDragEnd des issues */}
+    {showStatusModal && projectId && (
+      <StatusManagementModal
+        projectId={projectId}
+        onReorder={(ids) => persistColumns(ids)}
+        onClose={() => {
+          setShowStatusModal(false)
+          fetchBoard(projectId)
+        }}
+      />
+    )}
+    </>
   )
 }
 
 type BoardColumnProps = {
-  status: IssueStatus
+  statusId: string
   label: string
   accent: string
   issues: IssueDTO[]
@@ -496,9 +523,9 @@ type BoardColumnProps = {
 }
 
 const BoardColumn = ({
-  status, label, accent, issues, onAskCreate, onEditIssue, onRemove,
+  statusId, label, accent, issues, onAskCreate, onEditIssue, onRemove,
 }: BoardColumnProps) => {
-  const { setNodeRef, isOver } = useDroppable({ id: `col:${status}` })
+  const { setNodeRef, isOver } = useDroppable({ id: `col:${statusId}` })
 
   return (
     <div ref={setNodeRef} style={{
