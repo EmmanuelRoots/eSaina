@@ -31,9 +31,9 @@ const LoginPage = () => {
     }
   }
 
-  const onGoogleSuccess = (res: CredentialResponse) => {
+  const onGoogleSuccess = async (res: CredentialResponse) => {
     const googleUser = jwtDecode(res.credential || '') as GoogleLoginDTO
-    login(googleUser)
+    await login(googleUser).catch(() => { /* alert already shown in login */ })
   }
 
   return (
@@ -93,7 +93,7 @@ const LoginPage = () => {
           <p className="login-subtitle">Connectez-vous pour continuer sur votre workspace.</p>
 
           <div style={{ width: '100%' }}>
-            <GoogleLogin onSuccess={onGoogleSuccess} useOneTap={false} width="100%" />
+            <GoogleLogin onSuccess={onGoogleSuccess} useOneTap={false} />
           </div>
 
           <div className="login-divider">

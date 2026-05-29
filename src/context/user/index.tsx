@@ -23,12 +23,19 @@ const AuthProvider = (props: {children: JSX.Element}) => {
 
     useEffect(() => {
         const token = localStorage.getItem(LocalStorageKeys.ACCESS_TOKEN)
-        
+        let cancelled = false
+
         if(token) {
-            userApi.getUserByToken().then(res=>{
-                setUser(res.data)
-            })
+            userApi.getUserByToken()
+                .then(res => { if (!cancelled) setUser(res.data) })
+                .catch(() => {
+                    if (!cancelled) {
+                        localStorage.removeItem(LocalStorageKeys.ACCESS_TOKEN)
+                        localStorage.removeItem(LocalStorageKeys.REFRESH_TOKEN)
+                    }
+                })
         }
+        return () => { cancelled = true }
     },[])
 
     const login = async (credentials:LoginDTO | GoogleLoginDTO) => {
@@ -49,7 +56,7 @@ const AuthProvider = (props: {children: JSX.Element}) => {
             setUser(usr.data)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err:any) {
-            alert(err.response.data.message)
+            alert(err?.response?.data?.message ?? 'Une erreur est survenue')
             throw err; // 👈 important : pour que GenericForm attrape l'erreur
         } finally {
             // setTimeout(()=> {
