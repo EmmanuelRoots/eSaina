@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO, type IssueCommentDTO } from "../../data/dto/issue";
+import { IssueType, IssuePriority, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO, type IssueCommentDTO } from "../../data/dto/issue";
 import type { UserDTO } from "../../data/dto/user";
 import { useProject } from "../../context/project/useProject";
 import issueApi from "../../services/api/issue.api";
@@ -22,6 +22,7 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [type, setType] = useState<IssueType>(initialData?.type || IssueType.TASK);
+  const [priority, setPriority] = useState<IssuePriority>(initialData?.priority || IssuePriority.MEDIUM);
   // statusId fait référence à l'id du ProjectStatus (UUID) — source de vérité pour la colonne du board.
   // On initialise avec le statusId de l'issue ou le premier statut du projet si c'est une création.
   const [statusId, setStatusId] = useState<string | undefined>(
@@ -66,6 +67,7 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
       description,
       type,
       statusId,
+      priority,
       // On omet les champs null/undefined pour ne pas déclencher la validation TSOA
       // (noImplicitAdditionalProperties: throw-on-extras rejette null sur number? ou string?)
       ...(assigneeId !== undefined && { assigneeId }),
@@ -134,6 +136,20 @@ export const IssueForm = ({ initialData, onSubmit, onCancel, projectId, sprintId
             </select>
           </div>
         </Row>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={labelStyle}>Priorité</label>
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as IssuePriority)}
+            style={selectStyle}
+          >
+            <option value={IssuePriority.LOW}>🔵 Basse</option>
+            <option value={IssuePriority.MEDIUM}>🟡 Moyenne</option>
+            <option value={IssuePriority.HIGH}>🟠 Haute</option>
+            <option value={IssuePriority.CRITICAL}>🔴 Critique</option>
+          </select>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <label style={labelStyle}>Responsable</label>

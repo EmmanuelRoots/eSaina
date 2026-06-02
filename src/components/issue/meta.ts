@@ -20,3 +20,4 @@ export const PRIORITY_META: Record<IssuePriority, Meta> = {
   [IssuePriority.HIGH]:     { label: 'Haute',    color: '#f97316', Icon: ChevronUp },
   [IssuePriority.CRITICAL]: { label: 'Critique', color: '#ef4444', Icon: ChevronsUp },
 }
+
