@@ -365,7 +365,7 @@ const ChipBtn = ({
 )
 
 const AssigneeRow = ({
-  id, label, user, active, onClick,
+  label, user, active, onClick,
 }: {
   id: string
   label: string
