@@ -2,22 +2,27 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import {
   Search, Plus, Play, Square, ChevronDown, ChevronRight, Flag, CalendarClock,
-  Inbox, GripVertical, MoreHorizontal, ArrowDownUp, User,
+  Inbox, GripVertical, MoreHorizontal, User,
 } from "lucide-react"
 import { useProject } from "../../context/project/useProject"
 import {
-  IssueStatus, IssueType, type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO
+  IssueStatus, type IssueDTO, type IssueLabelDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO
 } from "../../data/dto/issue"
 import { SprintStatus, type SprintDTO } from "../../data/dto/sprint"
 import { StatusCategory, type ProjectStatusDTO } from "../../data/dto/project"
 import Row from "../../components/row"
 import { Avatar } from "../../components/avatar"
 import { TypeIcon } from "../../components/issue/TypeIcon"
-import { ISSUE_TYPE_META } from "../../components/issue/meta"
 import { PriorityIcon } from "../../components/issue/PriorityIcon"
 import { IssueLabel } from "../../components/issue/IssueLabel"
 import { Points } from "../../components/issue/Points"
 import { IssueForm } from "../../components/issue/IssueForm"
+import {
+  IssueFilterPanel,
+  type IssueFilterState,
+  DEFAULT_FILTERS,
+  applyIssueFilters,
+} from "../../components/issue/IssueFilterPanel"
 
 const DEFAULT_STATUS_LABEL: Record<string, string> = {
   [IssueStatus.TODO]: 'À faire',
@@ -353,7 +358,7 @@ const Backlog = () => {
     createIssue, updateIssue, createSprint, startSprint, closeSprint 
   } = useProject()
   const [searchQ, setSearchQ] = useState('')
-  const [typeFilter, setTypeFilter] = useState<IssueType | null>(null)
+  const [filters, setFilters] = useState<IssueFilterState>(DEFAULT_FILTERS)
   const [modalData, setModalData] = useState<{ open: boolean; sprintId?: string | null; issue?: IssueDTO }>({ open: false })
 
   const handleCreateOrUpdate = async (data: CreateIssueRequestDTO | UpdateIssueRequestDTO) => {
@@ -383,23 +388,41 @@ const Backlog = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
-  const filter = (i: IssueDTO) => {
-    const q = searchQ.toLowerCase()
-    const hitText = !q || i.title.toLowerCase().includes(q) || i.key.toLowerCase().includes(q)
-    const hitType = !typeFilter || i.type === typeFilter
-    return hitText && hitType
-  }
+  /** Membres uniques extraits de toutes les issues (sprints + backlog). */
+  const teamMembers = useMemo(() => {
+    const allIssues = [
+      ...backlogIssues,
+      ...sprints.flatMap(s => s.issues),
+    ]
+    const map = new Map<string, IssueDTO['assignee']>()
+    allIssues.forEach(i => {
+      const id = i.assigneeId || i.assignee?.id
+      if (id) map.set(id, i.assignee)
+    })
+    return Array.from(map.values()).filter(Boolean) as NonNullable<IssueDTO['assignee']>[]
+  }, [backlogIssues, sprints])
+
+  /** Labels uniques extraits de toutes les issues. */
+  const allLabels = useMemo((): IssueLabelDTO[] => {
+    const allIssues = [...backlogIssues, ...sprints.flatMap(s => s.issues)]
+    const map = new Map<string, IssueLabelDTO>()
+    allIssues.forEach(i => (i.labels ?? []).forEach(l => map.set(l.id, l)))
+    return Array.from(map.values())
+  }, [backlogIssues, sprints])
+
+  const filter = (i: IssueDTO) => applyIssueFilters(i, filters, searchQ)
 
   return (
     <div style={{ height: 'calc(100vh - 60px)', overflowY: 'auto' }}>
       {/* Toolbar */}
       <div style={{
         padding: '16px 24px 0',
-        display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
       }}>
+        {/* Recherche textuelle */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          height: 36, padding: '0 12px', width: 300,
+          height: 36, padding: '0 12px', width: 280,
           background: 'var(--color-surface)',
           border: '1px solid var(--color-border)', borderRadius: 8,
         }}>
@@ -412,34 +435,16 @@ const Backlog = () => {
           />
         </div>
 
-        <div style={{
-          display: 'flex', gap: 4, padding: 4,
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)', borderRadius: 10,
-        }}>
-          {(Object.entries(ISSUE_TYPE_META) as Array<[IssueType, typeof ISSUE_TYPE_META[IssueType]]>).map(([key, meta]) => {
-            const active = typeFilter === key
-            return (
-              <button
-                key={key}
-                onClick={() => setTypeFilter(active ? null : key)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 10px', borderRadius: 6,
-                  background: active ? 'var(--color-primary50)' : 'transparent',
-                  color: active ? 'var(--color-primary-hover)' : 'var(--color-text-secondary)',
-                  fontSize: 12, fontWeight: 600,
-                }}
-              >
-                <TypeIcon type={key} size={10} /> {meta.label}
-              </button>
-            )
-          })}
-        </div>
+        {/* Panneau de filtres multi-critères */}
+        <IssueFilterPanel
+          filters={filters}
+          onChange={setFilters}
+          teamMembers={teamMembers}
+          allLabels={allLabels}
+        />
 
         <span style={{ flex: 1 }} />
-        <button style={btnSecondaryStyle}><ArrowDownUp size={14} />Trier</button>
-        <button 
+        <button
           onClick={() => setModalData({ open: true })}
           style={btnPrimaryStyle}
         >

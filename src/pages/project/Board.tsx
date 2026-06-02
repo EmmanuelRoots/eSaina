@@ -4,6 +4,12 @@ import {
   Search, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check, Settings2,
 } from "lucide-react"
 import {
+  IssueFilterPanel,
+  type IssueFilterState,
+  DEFAULT_FILTERS,
+  applyIssueFilters,
+} from "../../components/issue/IssueFilterPanel"
+import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
   closestCorners, useDroppable,
   type DragEndEvent, type DragStartEvent,
@@ -13,7 +19,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useProject } from "../../context/project/useProject"
-import { type IssueDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
+import { type IssueDTO, type IssueLabelDTO, type CreateIssueRequestDTO, type UpdateIssueRequestDTO } from "../../data/dto/issue"
 import { SprintStatus } from "../../data/dto/sprint"
 import Column from "../../components/column"
 import Row from "../../components/row"
@@ -34,7 +40,7 @@ const Board = () => {
     createIssue, updateIssue, moveIssue,
   } = useProject()
   const [searchQ, setSearchQ] = useState('')
-  const [activeAssignee, setActiveAssignee] = useState<string | null>(null)
+  const [filters, setFilters] = useState<IssueFilterState>(DEFAULT_FILTERS)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [modalData, setModalData] = useState<{ open: boolean; statusId?: string; issue?: IssueDTO }>({ open: false })
   const [showAddMenu, setShowAddMenu] = useState(false)
@@ -133,19 +139,25 @@ const Board = () => {
 
   const activeSprint = sprints.find((s) => s.status === SprintStatus.ACTIVE)
 
-  const matchesFilter = (issue: IssueDTO) => {
-    const q = searchQ.toLowerCase()
-    const hitText = !q || issue.title.toLowerCase().includes(q) || issue.key.toLowerCase().includes(q)
-    const hitAssignee = !activeAssignee || issue.assignee?.id === activeAssignee
-    return hitText && hitAssignee
-  }
+  const matchesFilter = (issue: IssueDTO) => applyIssueFilters(issue, filters, searchQ)
 
+  /** Membres uniques présents dans les issues du board. */
   const teamMembers = useMemo(() => {
     const map = new Map<string, IssueDTO['assignee']>()
-    Object.values(boardIssues).flat().forEach((i) => {
-      if (i.assignee?.id) map.set(i.assignee.id, i.assignee)
+    Object.values(boardIssues).flat().forEach(i => {
+      const id = i.assigneeId || i.assignee?.id
+      if (id) map.set(id, i.assignee)
     })
     return Array.from(map.values()).filter(Boolean) as NonNullable<IssueDTO['assignee']>[]
+  }, [boardIssues])
+
+  /** Labels uniques présents dans les issues du board. */
+  const allLabels = useMemo((): IssueLabelDTO[] => {
+    const map = new Map<string, IssueLabelDTO>()
+    Object.values(boardIssues).flat().forEach(i =>
+      (i.labels ?? []).forEach(l => map.set(l.id, l))
+    )
+    return Array.from(map.values())
   }, [boardIssues])
 
   const sprintProgress = activeSprint?.startDate && activeSprint?.endDate
@@ -292,25 +304,45 @@ const Board = () => {
         }}>
           <SearchInput value={searchQ} onChange={setSearchQ} placeholder="Rechercher dans le tableau…" />
 
+          {/* Avatars des membres : raccourci visuel pour le filtre assigné */}
           <Row style={{ alignItems: 'center' }}>
-            {teamMembers.map((m, i) => (
-              <button
-                key={m.id ?? i}
-                onClick={() => setActiveAssignee(activeAssignee === m.id ? null : (m.id ?? null))}
-                title={`${m.firstName ?? ''} ${m.lastName ?? ''}`}
-                style={{
-                  marginLeft: i === 0 ? 0 : -6,
-                  opacity: activeAssignee && activeAssignee !== m.id ? 0.35 : 1,
-                  transition: 'all 150ms cubic-bezier(.4,0,.2,1)',
-                }}
-              >
-                <Avatar user={m} size={30} ring={activeAssignee === m.id ? 'var(--color-primary)' : 'var(--color-surface)'} />
-              </button>
-            ))}
+            {teamMembers.map((m, i) => {
+              const isFiltered = filters.assigneeIds.includes(m.id ?? '')
+              const anyAssigneeFilter = filters.assigneeIds.length > 0
+              return (
+                <button
+                  key={m.id ?? i}
+                  onClick={() => {
+                    const id = m.id ?? ''
+                    const next = isFiltered
+                      ? filters.assigneeIds.filter(x => x !== id)
+                      : [...filters.assigneeIds, id]
+                    setFilters({ ...filters, assigneeIds: next })
+                  }}
+                  title={`${m.firstName ?? ''} ${m.lastName ?? ''}`}
+                  style={{
+                    marginLeft: i === 0 ? 0 : -6,
+                    opacity: anyAssigneeFilter && !isFiltered ? 0.35 : 1,
+                    transition: 'all 150ms cubic-bezier(.4,0,.2,1)',
+                  }}
+                >
+                  <Avatar
+                    user={m}
+                    size={30}
+                    ring={isFiltered ? 'var(--color-primary)' : 'var(--color-surface)'}
+                  />
+                </button>
+              )
+            })}
           </Row>
-          {activeAssignee && (
-            <button onClick={() => setActiveAssignee(null)} style={{ fontSize: 12, color: 'var(--color-text-secondary)', textDecoration: 'underline' }}>Effacer</button>
-          )}
+
+          {/* Panneau de filtres multi-critères */}
+          <IssueFilterPanel
+            filters={filters}
+            onChange={setFilters}
+            teamMembers={teamMembers}
+            allLabels={allLabels}
+          />
 
           <span style={{ flex: 1 }} />
 
