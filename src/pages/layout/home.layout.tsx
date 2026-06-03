@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Sidebar } from "../../components/sidebar"
+import { NotificationBell } from "../../components/notification-bell"
 import { useThemeColors } from "../../hooks/theme"
 import { UseSSE } from "../../context/sse"
 import "./index.css"
@@ -25,7 +26,22 @@ const HomeLayout = () => {
     <div style={{ display: 'flex', height: '100vh', background: 'var(--color-background)' }}>
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-        <Outlet />
+        {/* Barre de titre avec cloche de notifications */}
+        <header style={{
+          height: 52,
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: '0 16px',
+          borderBottom: '1px solid var(--color-border)',
+          background: 'var(--color-surface)',
+        }}>
+          <NotificationBell />
+        </header>
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <Outlet />
+        </div>
       </main>
     </div>
   )

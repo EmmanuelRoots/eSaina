@@ -130,6 +130,28 @@ export const NewPostItem = ({ post }: PostItemProps) => {
         padding: '4px 8px', display: 'flex',
         borderTop: '1px solid var(--color-border)', position: 'relative',
       }}>
+        {/* Picker sorti du bouton pour éviter le button-dans-button interdit en HTML */}
+        {picker && (
+          <div
+            onMouseEnter={() => setPicker(true)}
+            onMouseLeave={() => setPicker(false)}
+            style={{
+              position: 'absolute', bottom: '100%', left: 12, marginBottom: 8,
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 999, padding: '6px 10px',
+              display: 'flex', gap: 6, boxShadow: 'var(--shadow-lg)',
+              zIndex: 10,
+            }}>
+            {(Object.keys(REACTION_META) as ReactionType[]).map((t) => (
+              <button
+                key={t}
+                onClick={(e) => { e.stopPropagation(); toggle(t as ReactionType) }}
+                style={{ width: 36, height: 36, borderRadius: '50%', fontSize: 22 }}
+              >{REACTION_META[t as ReactionType].emoji}</button>
+            ))}
+          </div>
+        )}
         <button
           onClick={() => toggle(myReaction ?? RT.LIKE)}
           onMouseEnter={() => setPicker(true)}
@@ -146,25 +168,6 @@ export const NewPostItem = ({ post }: PostItemProps) => {
             : <ThumbsUp size={18} />
           }
           <span>{myReaction ? myReaction.charAt(0) + myReaction.slice(1).toLowerCase() : "Réagir"}</span>
-
-          {picker && (
-            <div style={{
-              position: 'absolute', bottom: '100%', left: 12, marginBottom: 8,
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 999, padding: '6px 10px',
-              display: 'flex', gap: 6, boxShadow: 'var(--shadow-lg)',
-              zIndex: 10,
-            }}>
-              {(Object.keys(REACTION_META) as ReactionType[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={(e) => { e.stopPropagation(); toggle(t) }}
-                  style={{ width: 36, height: 36, borderRadius: '50%', fontSize: 22 }}
-                >{REACTION_META[t].emoji}</button>
-              ))}
-            </div>
-          )}
         </button>
         <button style={actionBtn}>
           <MessageCircle size={18} /><span>Commenter</span>
