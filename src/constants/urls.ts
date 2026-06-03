@@ -14,8 +14,11 @@ export const urls = {
     SEND_MESSAGE: `/conversation/send-message`,
     GET_ALL_MESSAGE : `/conversation/get-all-messages`
   },
-  notification : {
-    SEND:'/notification/send',
+  notification: {
+    SEND: '/notification/send',
+    LIST: '/notification',
+    MARK_AS_READ: (id: string) => `/notification/${id}/read`,
+    MARK_ALL_READ: '/notification/read-all',
   },
   salon : {
     GET_USER_SALON : `/salon/get-user-salon`,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 import {
   Search, Eye, Sparkles, Flag, Square, Plus, EyeOff, Check, Settings2,
 } from "lucide-react"
@@ -35,6 +35,7 @@ const daysBetween = (a: string, b: string) =>
 
 const Board = () => {
   const { projectId } = useParams<{ projectId: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const {
     boardIssues, fetchBoard, fetchProjectData, currentProject, sprints, fetchBacklog,
     createIssue, updateIssue, moveIssue,
@@ -180,6 +181,18 @@ const Board = () => {
     }
     return null
   }
+
+  // Ouvre le modal d'un ticket ciblé via le query param ?issue=:id (ex. depuis une notification).
+  // Se déclenche à chaque mise à jour de boardIssues pour gérer le cas où les données
+  // ne sont pas encore chargées au moment de la navigation.
+  useEffect(() => {
+    const issueId = searchParams.get('issue')
+    if (!issueId) return
+    const found = findIssueById(issueId)
+    if (!found) return
+    setModalData({ open: true, issue: found.issue, statusId: found.statusKey })
+    setSearchParams(prev => { prev.delete('issue'); return prev }, { replace: true })
+  }, [boardIssues]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeIssue = activeDragId ? findIssueById(activeDragId)?.issue ?? null : null
 
